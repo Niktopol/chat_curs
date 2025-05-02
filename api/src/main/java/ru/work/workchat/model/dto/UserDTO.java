@@ -12,6 +12,18 @@ public class UserDTO {
     private String username;
     private String password;
 
+    public boolean isNameValid(){
+        return !name.isEmpty() && name.length() <= 25;
+    }
+
+    public boolean isUsernameValid(){
+        return !username.isEmpty() && username.length() <= 25;
+    }
+
+    public boolean isPasswordValid(){
+        return !password.isEmpty() && password.length() <= 25;
+    }
+
     public UserDTO(){
         this.name = "";
         this.username = "";

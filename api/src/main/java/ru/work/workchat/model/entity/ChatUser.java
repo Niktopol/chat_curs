@@ -12,7 +12,7 @@ import ru.work.workchat.model.entity.key.ChatUserKey;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "chat_user")
+@Table(name = "chat_member")
 public class ChatUser {
     public enum Role{
         USER,

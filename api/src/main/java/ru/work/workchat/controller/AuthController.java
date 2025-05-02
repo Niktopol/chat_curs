@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.work.workchat.model.dto.UserDTO;
+import ru.work.workchat.model.dto.UserInfoDTO;
 import ru.work.workchat.service.AuthService;
 
 @AllArgsConstructor
@@ -40,7 +41,7 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<String> profile(){
+    public ResponseEntity<UserInfoDTO> profile(){
         return ResponseEntity.ok(authService.profile());
     }
 }

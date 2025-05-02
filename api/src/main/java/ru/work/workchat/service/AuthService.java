@@ -17,6 +17,7 @@ import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import ru.work.workchat.model.dto.UserDTO;
+import ru.work.workchat.model.dto.UserInfoDTO;
 import ru.work.workchat.model.entity.User;
 import ru.work.workchat.repository.UserRepository;
 
@@ -42,14 +43,14 @@ public class AuthService {
 
     @Transactional
     public String register(UserDTO userData) {
-        if (userData.getName().isEmpty()){
-            return "'name' value is required";
+        if (!userData.isNameValid()){
+            return "Invalid 'name' value";
         }
-        if (userData.getUsername().isEmpty()){
-            return "'username' value is required";
+        if (!userData.isUsernameValid()){
+            return "Invalid 'username' value";
         }
-        if (userData.getPassword().isEmpty()){
-            return "'password' value is required";
+        if (!userData.isPasswordValid()){
+            return "Invalid 'password' value";
         }
         User user = new User(userData.getName(), userData.getUsername(),
                 passwordEncoder.encode(userData.getPassword()), User.Role.USER);
@@ -80,7 +81,7 @@ public class AuthService {
         return "";
     }
 
-    public String profile(){
-        return SecurityContextHolder.getContext().getAuthentication().getName();
+    public UserInfoDTO profile(){
+        return new UserInfoDTO(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get());
     }
 }

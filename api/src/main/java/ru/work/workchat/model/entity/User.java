@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "user")
+@Table(name = "chat_user")
 public class User implements UserDetails {
     public enum Role{
         USER,
@@ -26,13 +26,13 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 25)
     private String name;
 
     @Column(unique = true, nullable = false, length = 25)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 25)
     private String password;
 
     @Enumerated(EnumType.STRING)

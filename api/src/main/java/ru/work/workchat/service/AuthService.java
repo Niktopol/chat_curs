@@ -79,4 +79,8 @@ public class AuthService {
 
         return "";
     }
+
+    public String profile(){
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
 }

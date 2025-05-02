@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,5 +37,10 @@ public class AuthController {
         }else{
             return ResponseEntity.status(HttpServletResponse.SC_BAD_REQUEST).body(resp);
         }
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<String> profile(){
+        return ResponseEntity.ok(authService.profile());
     }
 }

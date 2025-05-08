@@ -1,4 +1,5 @@
 import "./globals.css";
+import "@/lib/fontawesome"
 
 export const metadata = {
   title: "Workchat.pro",

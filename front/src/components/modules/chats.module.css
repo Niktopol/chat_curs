@@ -1,0 +1,68 @@
+.main{
+    display: grid;
+    grid-template-rows: 60px 1fr;
+    background-color: #000;
+    border-right: 5px solid #000;
+}
+
+.search_block{
+    background-color: #000;
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    justify-items: center;
+}
+
+.chats_profile_toggle{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.chats_profile_button{
+    color: #fff;
+    width: 30px;
+    height: 30px;
+}
+
+.hidden{
+    display: none;
+}
+
+.searchbar{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    align-self: center;
+    margin: 0 15px;
+    padding: 5px 10px;
+    border-radius: 18px;
+    border: 2px solid #fff;
+}
+
+.search_icon{
+    color: #fff;
+    height: 18px;
+    width: 18px;
+}
+
+.searchbar_input{
+    width: 100%;
+    outline: none;
+    border: none;
+    font-size: 18px;
+    color: #fff;
+    background-color: transparent;
+}
+
+.searchbar_input::placeholder{
+    color: #c9c9c9;
+}   
+
+.panel_wrapper{
+    position: relative;
+    background-color: #fff;
+    border-top-right-radius: 50px;
+}

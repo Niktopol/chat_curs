@@ -1,5 +1,6 @@
 import "./globals.css";
 import "@/lib/fontawesome"
+import { Providers } from "./providers";
 
 export const metadata = {
   title: "Workchat.pro",
@@ -10,7 +11,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ru">
       <body>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

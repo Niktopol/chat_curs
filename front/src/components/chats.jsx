@@ -19,7 +19,7 @@ export default function Chats(){
                 </div>
                 <div className={styles.searchbar}>
                     <FontAwesomeIcon icon={faMagnifyingGlass} className={styles.search_icon}/>
-                    <input className={styles.searchbar_input} placeholder="Поиск"></input>
+                    <input className={styles.searchbar_input} placeholder="Поиск" maxLength={21} disabled={isHidden != null && !isHidden}></input>
                 </div>
             </div>
             <div className={styles.panel_wrapper}>

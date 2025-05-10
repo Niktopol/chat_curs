@@ -3,6 +3,7 @@
     grid-template-rows: 60px 1fr;
     background-color: #000;
     border-right: 5px solid #000;
+    border-bottom: 5px solid #000;
 }
 
 .search_block{
@@ -10,6 +11,8 @@
     display: grid;
     grid-template-columns: 60px 1fr;
     justify-items: center;
+    padding-right: 10px;
+    gap: 10px;
 }
 
 .chats_profile_toggle{
@@ -22,8 +25,8 @@
 
 .chats_profile_button{
     color: #fff;
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
 }
 
 .hidden{
@@ -36,9 +39,8 @@
     align-items: center;
     gap: 5px;
     align-self: center;
-    margin: 0 15px;
-    padding: 5px 10px;
-    border-radius: 18px;
+    padding: 7px 12px;
+    border-radius: 20px;
     border: 2px solid #fff;
 }
 
@@ -65,4 +67,5 @@
     position: relative;
     background-color: #fff;
     border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
 }

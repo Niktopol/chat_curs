@@ -20,6 +20,9 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 50)
+    private String name;
+
     @Column(nullable = false)
     private boolean isPrivate;
 

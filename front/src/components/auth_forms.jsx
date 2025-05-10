@@ -53,18 +53,38 @@ export function RegForm() {
                 className={styles.field}
                 type="text"
                 placeholder="Никнейм"
-                maxLength={20}
-                {...register("name", { required: "Введите никнейм", onChange: () => clearErrors(["fail"]) })}
+                {...register("name", {
+                    required: "Введите никнейм",
+                    maxLength: {
+                        value: 20,
+                        message: "Значение должно быть короче 20 символов"
+                    },
+                    pattern: {
+                        value: /^\S+$/,
+                        message: "Никнейм не должен содержать пробелов"
+                    },
+                    onChange: () => clearErrors(["fail"])
+                })}
                 disabled={isSubmitting}/>
-                <p className={styles.error_msg}>{errors.nickname?.message ? errors.nickname?.message : "" }</p>
+                <p className={styles.error_msg}>{errors.name?.message ? errors.name?.message : "" }</p>
             </div>
 
             <div className={styles.input_wrapper}><input
                 className={styles.field}
                 type="text"
                 placeholder="Имя пользователя"
-                maxLength={20}
-                {...register("username", { required: "Введите имя пользователя", onChange: () => clearErrors(["fail"]) })}
+                {...register("username", {
+                    required: "Введите имя пользователя",
+                    maxLength: {
+                        value: 20,
+                        message: "Значение должно быть короче 20 символов"
+                    },
+                    pattern: {
+                        value: /^[A-Za-z0-9\-=_#+]+$/,
+                        message: "Допустимы только англ. буквы, цифры и -=_#+"
+                    },
+                    onChange: () => clearErrors(["fail"])
+                })}
                 disabled={isSubmitting}/>
                 <p className={styles.error_msg}>{errors.username?.message ? errors.username?.message : "" }</p>
             </div>
@@ -73,8 +93,22 @@ export function RegForm() {
                 className={styles.field}
                 type="password"
                 placeholder="Пароль"
-                maxLength={25}
-                {...register("password1", { required: "Введите пароль", onChange: () => clearErrors(["fail", "passuneq"]) })}
+                {...register("password1", {
+                    required: "Введите пароль",
+                    minLength: {
+                        value: 8,
+                        message: "Значение должно быть длиннее 8 символов"
+                    },
+                    maxLength: {
+                        value: 25,
+                        message: "Значение должно быть короче 25 символов"
+                    },
+                    pattern: {
+                        value: /^[A-Za-z0-9\-=_#+&$]+$/,
+                        message: "Допустимы только англ. буквы, цифры и -=_#+&$"
+                    },
+                    onChange: () => clearErrors(["fail", "passuneq"])
+                })}
                 disabled={isSubmitting}/>
                 <p className={styles.error_msg}>{errors.passuneq?.message ? errors.passuneq?.message : (errors.password1?.message ? errors.password1?.message : "")}</p>
             </div>
@@ -83,7 +117,22 @@ export function RegForm() {
                 className={styles.field}
                 type="password"
                 placeholder="Повтор пароля"
-                {...register("password2", { required: "Повторите пароль", onChange: () => clearErrors(["fail", "passuneq"]) })}
+                {...register("password2", {
+                    required: "Повторите пароль",
+                    minLength: {
+                        value: 8,
+                        message: "Значение должно быть длиннее 8 символов"
+                    },
+                    maxLength: {
+                        value: 25,
+                        message: "Значение должно быть короче 25 символов"
+                    },
+                    pattern: {
+                        value: /^[A-Za-z0-9\-=_#+&$]+$/,
+                        message: "Допустимы только англ. буквы, цифры и -=_#+&$"
+                    },
+                    onChange: () => clearErrors(["fail", "passuneq"])
+                })}
                 disabled={isSubmitting}/>
                 <p className={styles.error_msg}>{errors.passuneq?.message ? errors.passuneq?.message : (errors.password2?.message ? errors.password2?.message : "")}</p>
             </div>
@@ -136,8 +185,18 @@ export function LoginForm() {
                 className={styles.field}
                 type="text"
                 placeholder="Имя пользователя"
-                maxLength={20}
-                {...register("username", { required: "Введите имя пользователя", onChange: () => clearErrors(["fail"]) })}
+                {...register("username", {
+                    required: "Введите имя пользователя",
+                    maxLength: {
+                        value: 20,
+                        message: "Значение должно быть короче 20 символов"
+                    },
+                    pattern: {
+                        value: /^[A-Za-z0-9\-=_#+]+$/,
+                        message: "Допустимы только англ. буквы, цифры и -=_#+"
+                    },
+                    onChange: () => clearErrors(["fail"])
+                })}
                 disabled={isSubmitting}/>
                 <p className={styles.error_msg}>{errors.username?.message ? errors.username?.message : "" }</p>
             </div>
@@ -146,8 +205,22 @@ export function LoginForm() {
                 className={styles.field}
                 type="password"
                 placeholder="Пароль"
-                maxLength={25}
-                {...register("password", { required: "Введите пароль", onChange: () => clearErrors(["fail"]) })}
+                {...register("password", {
+                    required: "Введите пароль",
+                    minLength: {
+                        value: 8,
+                        message: "Значение должно быть длиннее 8 символов"
+                    },
+                    maxLength: {
+                        value: 25,
+                        message: "Значение должно быть короче 25 символов"
+                    },
+                    pattern: {
+                        value: /^[A-Za-z0-9\-=_#+&$]+$/,
+                        message: "Допустимы только англ. буквы, цифры и -=_#+&$"
+                    },
+                    onChange: () => clearErrors(["fail"])
+                })}
                 disabled={isSubmitting}/>
                 <p className={styles.error_msg}>{errors.password?.message ? errors.password?.message : "" }</p>
             </div>

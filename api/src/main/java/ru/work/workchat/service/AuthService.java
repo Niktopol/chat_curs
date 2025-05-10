@@ -33,10 +33,13 @@ public class AuthService {
     @Transactional
     public String createUser(User user) {
         try{
+            if (userRepository.findByUsername(user.getUsername()).isPresent()){
+                return String.format("Имя пользователя '%s' уже занято", user.getUsername());
+            }
             userRepository.save(user);
-        }catch (Exception e){
+        } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            return String.format("Username '%s' is already taken", user.getUsername());
+            return "Произошла ошибка регистрации";
         }
         return "";
     }
@@ -44,13 +47,13 @@ public class AuthService {
     @Transactional
     public String register(UserDTO userData) {
         if (!userData.isNameValid()){
-            return "Invalid 'name' value";
+            return "Неверный никнейм";
         }
         if (!userData.isUsernameValid()){
-            return "Invalid 'username' value";
+            return "Неверное имя пользователя";
         }
         if (!userData.isPasswordValid()){
-            return "Invalid 'password' value";
+            return "Неверный пароль";
         }
         User user = new User(userData.getName(), userData.getUsername(),
                 passwordEncoder.encode(userData.getPassword()), User.Role.USER);
@@ -60,10 +63,10 @@ public class AuthService {
 
     public String login(UserDTO userData, HttpServletRequest request, HttpServletResponse response) {
         if (userData.getUsername().isEmpty()){
-            return "'username' value is required";
+            return "Нет имени пользователя";
         }
         if (userData.getPassword().isEmpty()){
-            return "'password' value is required";
+            return "Нет пароля";
         }
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 userData.getUsername(), userData.getPassword());
@@ -71,7 +74,7 @@ public class AuthService {
         try {
             authentication = authenticationManager.authenticate(token);
         }catch (AuthenticationException e){
-            return e.getMessage();
+            return "Неверное имя пользователя или пароль";
         }
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();

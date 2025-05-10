@@ -7,7 +7,7 @@ import LoadingPanel from "@/components/loading_panel";
 export default function Home() {
 return (
     <>
-      <LoadingPanel ignore_error={false}></LoadingPanel>
+      <LoadingPanel session_required={true}></LoadingPanel>
       <main className={styles.main}>
           <FetchUserSession mustHaveSession={true} redirect={"/login"}></FetchUserSession>
           <Chats></Chats>

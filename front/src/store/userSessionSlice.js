@@ -5,13 +5,18 @@ const initialState = {
   name: "",
   username: "",
   loading: true,
-  error: null
+  error: null,
+  image: "/default_user.svg"
 };
 
 export const userSessionSlice = createSlice({
   name: 'userSession',
   initialState,
-  reducers: {},
+  reducers: {
+    setImage: (state, action) => {
+      state.image = action.image;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserSession.pending, (state) => {

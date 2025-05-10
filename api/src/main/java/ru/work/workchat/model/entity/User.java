@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,13 +28,16 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 25)
+    @Column(nullable = false, length = 20)
     private String name;
 
-    @Column(unique = true, nullable = false, length = 25)
+    @JdbcTypeCode(SqlTypes.BINARY)
+    private byte[] profilePic;
+
+    @Column(unique = true, nullable = false, length = 20)
     private String username;
 
-    @Column(nullable = false, length = 25)
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)

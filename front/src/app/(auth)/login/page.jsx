@@ -7,7 +7,7 @@ import LoadingPanel from "@/components/loading_panel";
 export default function Login() {
 return (
     <>
-      <LoadingPanel ignore_error={true}></LoadingPanel>
+      <LoadingPanel session_required={false}></LoadingPanel>
       <main className={styles.main}>
       <FetchUserSession mustHaveSession={false} redirect={"/"}></FetchUserSession>
         <div className={styles.form_block}>

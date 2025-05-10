@@ -72,27 +72,27 @@ public class Security {
                 .exceptionHandling(e -> e
                         .accessDeniedHandler(
                                 (request, response, accessDeniedException) -> {
-                                    response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+                                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                                    response.getWriter().write("Access denied");
+                                    response.getWriter().write("{ \"Error\": \"Нет доступа\" }");
                                 })
                         .authenticationEntryPoint((request, response, accessDeniedException) -> {
-                            response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("Unauthorized");
+                            response.getWriter().write("{ \"Error\": \"Нет аутентификации\" }");
                         })
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .logout(logout ->
                         logout.logoutUrl("/logout").logoutSuccessHandler((request, response, authentication) -> {
-                            response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             if(authentication != null && authentication.isAuthenticated()){
                                 response.setStatus(HttpServletResponse.SC_OK);
-                                response.getWriter().write("Logged out successfully");
+                                response.getWriter().write("{ \"Success\": \"Выход выполнен\" }");
                             } else {
                                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                                response.getWriter().write("You are not signed in");
+                                response.getWriter().write("{ \"Error\": \"Вы не аутентифицированы\" }");
                             }
                         }).invalidateHttpSession(true));
         return http.build();

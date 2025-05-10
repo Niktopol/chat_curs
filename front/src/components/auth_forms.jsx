@@ -16,23 +16,29 @@ export function RegForm() {
 
     const onSubmit = async (data) => {
         if (data.password1 === data.password2){
-            const res = await fetch("http://localhost:8080/register", {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({name: data.name, username: data.username, password: data.password1}),
-            });
-
-            if (!res.ok){
-                const error = await res.json();
+            try {
+                const res = await fetch("http://localhost:8080/register", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({name: data.name, username: data.username, password: data.password1}),
+                });
+    
+                if (!res.ok){
+                    const error = await res.json();
+                    setError("fail", {
+                        type: "manual",
+                        message: error.error
+                    });
+                } else {
+                    router.push("/login");
+                }
+            } catch (e) {
                 setError("fail", {
                     type: "manual",
-                    message: error.error
+                    message: "Ошибка регистрации. Попробуйте позже"
                 });
-            } else {
-                router.push("/login");
             }
-        
         } else {
             setError("passuneq", {
                 type: "manual",
@@ -100,21 +106,27 @@ export function LoginForm() {
     const router = useRouter();
 
     const onSubmit = async (data) => {
-        const res = await fetch("http://localhost:8080/login", {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-
-        if (!res.ok){
-            const error = await res.json();
+        try {
+            const res = await fetch("http://localhost:8080/login", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            if (!res.ok){
+                const error = await res.json();
+                setError("fail", {
+                    type: "manual",
+                    message: error.error
+                });
+            } else {
+                router.push("/");
+            }
+        } catch (e){
             setError("fail", {
                 type: "manual",
-                message: error.error
+                message: "Ошибка входа. Попробуйте позже"
             });
-        } else {
-            router.push("/");
         }
     };
 

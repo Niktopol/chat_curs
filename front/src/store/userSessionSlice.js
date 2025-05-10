@@ -4,7 +4,7 @@ import { fetchUserSession } from './thunks/userSessionThunk';
 const initialState = {
   name: "",
   username: "",
-  loading: false,
+  loading: true,
   error: null
 };
 

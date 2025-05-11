@@ -13,8 +13,13 @@ export const userSessionSlice = createSlice({
   name: 'userSession',
   initialState,
   reducers: {
-    setImage: (state, action) => {
-      state.image = action.image;
+    setData: (state, action) => {
+      if (action.payload?.name) {
+        state.name = action.payload.name;
+      }
+      if (action.payload?.image) {
+        state.image = action.payload.image;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -28,12 +33,22 @@ export const userSessionSlice = createSlice({
         state.error = null;
         state.name = action.payload.name;
         state.username = action.payload.username;
+        if (action.payload?.image) {
+          state.image = action.payload.image;
+        } else {
+          state.image = "/default_user.svg";
+        }
+        
       })
       .addCase(fetchUserSession.rejected, (state, action) => {
+        state.name = "";
+        state.username = "";
         state.loading = false;
         state.error = action.payload;
+        state.image = "/default_user.svg";
       });
   }
 });
 
+export const { setData } = userSessionSlice.actions;
 export default userSessionSlice.reducer;

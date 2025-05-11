@@ -11,7 +11,7 @@
     display: grid;
     grid-template-columns: 60px 1fr;
     justify-items: center;
-    padding-right: 10px;
+    padding-right: 50px;
     gap: 10px;
 }
 
@@ -40,7 +40,6 @@
     gap: 5px;
     align-self: center;
     padding: 7px 12px;
-    border-radius: 20px;
     border: 2px solid #fff;
 }
 

@@ -31,6 +31,7 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 20)
     private String name;
 
+    @Basic(fetch = FetchType.LAZY)
     @JdbcTypeCode(SqlTypes.BINARY)
     private byte[] profilePic;
 

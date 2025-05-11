@@ -6,20 +6,30 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileImport, faPen } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { setData } from "@/store/userSessionSlice";
 
 export default function Profile({ hidden }){
     const session = useSelector((state) => state.userSession);
+    const dispatch = useDispatch();
     const [isEditing, setIsEditing] = useState(false);
+    const [doDelProfilePic, setDoDelProfilePic] = useState(false);
     const [userImage, setUserImage] = useState(session.image);
-    const [isImageTooBig, setIsImageTooBig] = useState(false);
+    const [imageErrorMsg, setImageErrorMsg] = useState("");
+    const router = useRouter();
 
     const resetEditing = () => {
         setIsEditing(false); 
         setUserImage(session.image);
-        setIsImageTooBig(false);
+        setImageErrorMsg("");
+        setDoDelProfilePic(false);
         reset({name: session.name});
     }
+
+    useEffect(() => {
+        if (doDelProfilePic) setUserImage("/default_user.svg");
+    }, [doDelProfilePic]);
 
     useEffect(() => {
         return () => {
@@ -29,7 +39,7 @@ export default function Profile({ hidden }){
 
     useEffect(() => {
         resetEditing();
-    }, [session, hidden]);
+    }, [hidden, session.name, session.image]);
 
     const {
         register,
@@ -39,10 +49,50 @@ export default function Profile({ hidden }){
         formState: { errors, isSubmitting },
     } = useForm({defaultValues: {name: session.name}});
 
-    const onSubmit = (data) => {
-        setIsEditing(false);
-        console.log(data);
-        //setSubmittedData({nickname: data.nickname})
+    const onSubmit = async (data) => {
+        try {
+            if (data.file) {
+                const formData = new FormData();
+                formData.append('file', data.file[0]);
+                const res = await fetch("http://localhost:8080/user/profilepic", {
+                    method: "PATCH",
+                    credentials: "include",
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    setUserImage(session.image);
+                    setValue("file", null);
+                    setImageErrorMsg((await res.json())?.error);
+                    return;
+                }
+
+            } else if (doDelProfilePic) {
+                const res = await fetch("http://localhost:8080/user/profilepic", {
+                    method: "DELETE",
+                    credentials: "include"
+                });
+
+                if (!res.ok) {
+                    throw new Error((await res.json())?.error);
+                }
+            }
+
+            const res = await fetch("http://localhost:8080/user/profile", {
+                method: "PATCH",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: data.name }),
+            });
+
+            if (!res.ok) {
+                throw new Error((await res.json())?.error);
+            }
+
+            dispatch(setData({name: data.name, image: userImage}));
+        } catch (e) {
+            router.push("/login");
+        }
     };
 
     return (
@@ -50,35 +100,39 @@ export default function Profile({ hidden }){
             <div className={styles.scroll_wrapper}>
                 <p className={styles.id}><span>@</span>{session.username}</p>
                 <form className={styles.edit_form} onSubmit={handleSubmit(onSubmit)}>
-                    <label htmlFor="profileimage" className={`${styles.image} ${!isEditing ? styles.disabled: ""}`}>
+                    <div className={styles.image_wrapper}>
+                        <label htmlFor="profileimage" className={`${styles.image} ${!isEditing ? styles.disabled: ""}`}>
                         <Image src={userImage} alt="" fill draggable={false} style={{objectFit: "cover", zIndex: 2}}></Image>
                         <div className={styles.image_edit_cover}>
                             <FontAwesomeIcon icon={faFileImport} className={styles.image_edit_cover_icon} />
                         </div>
                     </label>
+                    </div>
                     <input type="file"
                     accept="image/jpeg"
                     id="profileimage"
                     style={{display: "none"}}
                     {...register("file", {
                         onChange: (e) => {
-                            if (e.target.files[0].size < 5 * 1024 * 1024){
+                            URL.revokeObjectURL(userImage);
+                            if (e.target.files[0].size < 5 * 1024 * 1024) {
                                 setUserImage(URL.createObjectURL(e.target.files[0]));
-                                setIsImageTooBig(false);
+                                setDoDelProfilePic(false);
+                                setImageErrorMsg("")
                             } else {
+                                setUserImage(session.image);
                                 setValue("file", null);
-                                setIsImageTooBig(true);
+                                setImageErrorMsg("Размер изображения больше 5 МБ")
                             }
                         },
                         validate: {
                             lessThan5MB: (fileList) => {
-                                console.log(fileList);  
                                 if (fileList){
                                     if (fileList[0]?.size > 5 * 1024 * 1024) {
-                                        setIsImageTooBig(true);
+                                        setImageErrorMsg("Размер изображения больше 5 МБ")
                                         return "Размер изображения больше 5 МБ";
                                     } else {
-                                        setIsImageTooBig(false);
+                                        setImageErrorMsg("")
                                         return true;
                                     }
                                 }
@@ -86,9 +140,12 @@ export default function Profile({ hidden }){
                         },
                     })}
                     disabled={!isEditing || isSubmitting}/>
-                    <p className={styles.file_error_msg}>{isImageTooBig ? "Размер изображения больше 5 МБ" : ""}</p>
+                    <p className={styles.file_error_msg}>{imageErrorMsg}</p>
+                    {isEditing && (<input type="button" onClick={() => setDoDelProfilePic(true)} value={"Удалить фото"} className={styles.edit_button}/>)}
                     <div className={styles.nickname}><input
-                        placeholder="Введите никнейм"
+                        placeholder={session.name}
+                        autoComplete="off"
+                        autoCorrect="off"
                         className={styles.nickname_input}
                         {...register("name", {
                             required: "Введите никнейм",

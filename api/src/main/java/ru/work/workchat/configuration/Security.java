@@ -1,5 +1,6 @@
 package ru.work.workchat.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
+import ru.work.workchat.model.dto.OperationResultDTO;
 import ru.work.workchat.service.UserDetailsServiceImpl;
 
 import java.util.List;
@@ -73,13 +75,17 @@ public class Security {
                         .accessDeniedHandler(
                                 (request, response, accessDeniedException) -> {
                                     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                                    response.setCharacterEncoding("UTF-8");
+                                    ObjectMapper objectMapper = new ObjectMapper();
                                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                                    response.getWriter().write("{ \"Error\": \"Нет доступа\" }");
+                                    objectMapper.writeValue(response.getWriter(), new OperationResultDTO(null, "Нет доступа"));
                                 })
                         .authenticationEntryPoint((request, response, accessDeniedException) -> {
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding("UTF-8");
+                            ObjectMapper objectMapper = new ObjectMapper();
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("{ \"Error\": \"Нет аутентификации\" }");
+                            objectMapper.writeValue(response.getWriter(), new OperationResultDTO(null, "Нет аутентификации"));
                         })
                 )
                 .sessionManagement(session -> session
@@ -87,12 +93,14 @@ public class Security {
                 .logout(logout ->
                         logout.logoutUrl("/logout").logoutSuccessHandler((request, response, authentication) -> {
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.setCharacterEncoding("UTF-8");
+                            ObjectMapper objectMapper = new ObjectMapper();
                             if(authentication != null && authentication.isAuthenticated()){
                                 response.setStatus(HttpServletResponse.SC_OK);
-                                response.getWriter().write("{ \"Success\": \"Выход выполнен\" }");
+                                objectMapper.writeValue(response.getWriter(), new OperationResultDTO("Выход выполнен", null));
                             } else {
                                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                                response.getWriter().write("{ \"Error\": \"Вы не аутентифицированы\" }");
+                                objectMapper.writeValue(response.getWriter(), new OperationResultDTO(null, "Вы не аутентифицирован"));
                             }
                         }).invalidateHttpSession(true));
         return http.build();

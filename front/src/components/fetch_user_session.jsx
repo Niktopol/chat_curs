@@ -21,7 +21,8 @@ export default function FetchUserSession({ mustHaveSession, redirect }) {
             .unwrap()
             .then(() => {
                 router.push(redirect);
-            }).catch(() => {});
+            })
+            .catch(() => {});
         }
         
     }, [dispatch, router]);

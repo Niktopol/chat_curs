@@ -4,14 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.work.workchat.model.dto.OperationResultDTO;
 import ru.work.workchat.model.dto.UserDTO;
-import ru.work.workchat.model.dto.UserInfoDTO;
 import ru.work.workchat.service.AuthService;
 
 @AllArgsConstructor
@@ -41,10 +38,5 @@ public class AuthController {
         }else{
             return ResponseEntity.status(HttpServletResponse.SC_BAD_REQUEST).body(new OperationResultDTO(null, resp));
         }
-    }
-
-    @GetMapping("/profile")
-    public ResponseEntity<UserInfoDTO> profile(){
-        return ResponseEntity.ok(authService.profile());
     }
 }

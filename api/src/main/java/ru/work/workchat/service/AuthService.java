@@ -17,7 +17,6 @@ import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import ru.work.workchat.model.dto.UserDTO;
-import ru.work.workchat.model.dto.UserInfoDTO;
 import ru.work.workchat.model.entity.User;
 import ru.work.workchat.repository.UserRepository;
 
@@ -82,9 +81,5 @@ public class AuthService {
         securityContextRepository.saveContext(context, request, response);
 
         return "";
-    }
-
-    public UserInfoDTO profile(){
-        return new UserInfoDTO(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get());
     }
 }

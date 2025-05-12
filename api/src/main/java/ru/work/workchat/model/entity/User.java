@@ -31,6 +31,9 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 20)
     private String name;
 
+    @Column(nullable = false)
+    private Boolean isOnline;
+
     @Basic(fetch = FetchType.LAZY)
     @JdbcTypeCode(SqlTypes.BINARY)
     private byte[] profilePic;
@@ -79,6 +82,7 @@ public class User implements UserDetails {
         this.name = name;
         this.username = username;
         this.password = password;
+        this.isOnline = false;
         this.role = role;
     }
 }

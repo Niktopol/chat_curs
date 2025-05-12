@@ -9,7 +9,7 @@ export const fetchUserSession = createAsyncThunk(
             if (!session_resp.ok) throw new Error("Невозможно получить сессию");
 
             const session_resp_data = await session_resp.json();
-            const profilepic_resp = await fetch(`http://localhost:8080/user/profilepic/${session_resp_data.username}`, {credentials: "include"});
+            const profilepic_resp = await fetch(`http://localhost:8080/user/profilepic/${encodeURIComponent(session_resp_data.username)}`, {credentials: "include"});
 
             if (profilepic_resp.ok) {
                 const blob = await profilepic_resp.blob();

@@ -1,0 +1,81 @@
+.main{
+    position: absolute;
+    top: 0;
+    width: 600px;
+    height: 60px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.content{
+    position: absolute;
+    display: grid;
+    grid-template-columns: 54px 1fr;
+    gap: 5px;
+    height: 100%;
+    width: 100%;
+    padding: 0 5px;
+    background-color: #fff;
+    border: 3px solid #000;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    z-index: 1;
+}
+
+.background{
+    position: absolute;
+    top: 5px;
+    height: 100%;
+    width: 100%;
+    background-color: #000;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    z-index: 0;
+}
+
+.image{
+    padding: 5px;
+}
+
+.image_wrapper{
+    position: relative;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    border: 3px solid #000;
+    overflow: hidden;
+}
+
+.info{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.name{
+    position: relative;
+    font-size: 20px;
+}
+
+.status{
+    font-size: 14px;
+    color: #6d6d6d;
+}
+
+.chat_edit{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    padding: 50px;
+    z-index: 2;
+    background-color: #fff;
+}
+
+.close{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+}

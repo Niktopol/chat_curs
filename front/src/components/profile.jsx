@@ -33,13 +33,15 @@ export default function Profile({ hidden }){
 
     useEffect(() => {
         return () => {
-            if (userImage) URL.revokeObjectURL(userImage);
+            if (userImage.startsWith('blob:')) {
+                if (userImage) URL.revokeObjectURL(userImage);
+            }
         }
     }, [userImage]);
 
     useEffect(() => {
         resetEditing();
-    }, [hidden, session.name, session.image]);
+    }, [hidden, session]);
 
     const {
         register,
@@ -97,77 +99,80 @@ export default function Profile({ hidden }){
 
     return (
         <div className={`${styles.main} ${hidden != null ? (hidden ? styles.slide_left : styles.slide_right) : ""}`}>
-            <div className={styles.scroll_wrapper}>
-                <p className={styles.id}><span>@</span>{session.username}</p>
-                <form className={styles.edit_form} onSubmit={handleSubmit(onSubmit)}>
-                    <div className={styles.image_wrapper}>
-                        <label htmlFor="profileimage" className={`${styles.image} ${!isEditing ? styles.disabled: ""}`}>
-                        <Image src={userImage} alt="" fill draggable={false} style={{objectFit: "cover", zIndex: 2}}></Image>
-                        <div className={styles.image_edit_cover}>
-                            <FontAwesomeIcon icon={faFileImport} className={styles.image_edit_cover_icon} />
+            <div className={styles.hide_wrapper}>
+                <div className={styles.scroll_wrapper}>
+                    <p className={styles.id}><span>@</span>{session.username}</p>
+                    <form className={styles.edit_form} onSubmit={handleSubmit(onSubmit)}>
+                        <div className={styles.image_wrapper}>
+                            <label htmlFor="profileimage" className={`${styles.image} ${!isEditing ? styles.disabled: ""}`}>
+                            <Image src={userImage} alt="" fill draggable={false} style={{objectFit: "cover", zIndex: 2}}></Image>
+                            <div className={styles.image_edit_cover}>
+                                <FontAwesomeIcon icon={faFileImport} className={styles.image_edit_cover_icon} />
+                            </div>
+                        </label>
                         </div>
-                    </label>
-                    </div>
-                    <input type="file"
-                    accept="image/jpeg"
-                    id="profileimage"
-                    style={{display: "none"}}
-                    {...register("file", {
-                        onChange: (e) => {
-                            URL.revokeObjectURL(userImage);
-                            if (e.target.files[0].size < 5 * 1024 * 1024) {
-                                setUserImage(URL.createObjectURL(e.target.files[0]));
-                                setDoDelProfilePic(false);
-                                setImageErrorMsg("")
-                            } else {
-                                setUserImage(session.image);
-                                setValue("file", null);
-                                setImageErrorMsg("Размер изображения больше 5 МБ")
-                            }
-                        },
-                        validate: {
-                            lessThan5MB: (fileList) => {
-                                if (fileList){
-                                    if (fileList[0]?.size > 5 * 1024 * 1024) {
-                                        setImageErrorMsg("Размер изображения больше 5 МБ")
-                                        return "Размер изображения больше 5 МБ";
-                                    } else {
-                                        setImageErrorMsg("")
-                                        return true;
+                        <input type="file"
+                        accept="image/jpeg"
+                        id="profileimage"
+                        style={{display: "none"}}
+                        {...register("file", {
+                            onChange: (e) => {
+                                URL.revokeObjectURL(userImage);
+                                if (e.target.files[0].size < 5 * 1024 * 1024) {
+                                    setUserImage(URL.createObjectURL(e.target.files[0]));
+                                    setDoDelProfilePic(false);
+                                    setImageErrorMsg("")
+                                } else {
+                                    setUserImage(session.image);
+                                    setValue("file", null);
+                                    setImageErrorMsg("Размер изображения больше 5 МБ")
+                                }
+                            },
+                            validate: {
+                                lessThan5MB: (fileList) => {
+                                    if (fileList){
+                                        if (fileList[0]?.size > 5 * 1024 * 1024) {
+                                            setImageErrorMsg("Размер изображения больше 5 МБ")
+                                            return "Размер изображения больше 5 МБ";
+                                        } else {
+                                            setImageErrorMsg("")
+                                            return true;
+                                        }
                                     }
                                 }
-                            }
-                        },
-                    })}
-                    disabled={!isEditing || isSubmitting}/>
-                    <p className={styles.file_error_msg}>{imageErrorMsg}</p>
-                    {isEditing && (<input type="button" onClick={() => setDoDelProfilePic(true)} value={"Удалить фото"} className={styles.edit_button}/>)}
-                    <div className={styles.nickname}><input
-                        placeholder={session.name}
-                        autoComplete="off"
-                        autoCorrect="off"
-                        className={styles.nickname_input}
-                        {...register("name", {
-                            required: "Введите никнейм",
-                            maxLength: {
-                                value: 20,
-                                message: "Значение должно быть короче 20 символов"
-                            },
-                            pattern: {
-                                value: /^\S+$/,
-                                message: "Никнейм не должен содержать пробелов"
                             },
                         })}
                         disabled={!isEditing || isSubmitting}/>
-                        <p className={styles.error_msg}>{errors.name?.message ? errors.name?.message : ""}</p>
-                    </div>
-                    {!isEditing && (<input type="button" onClick={() => setIsEditing(true)} value={"Изменить"} className={styles.edit_button}/>)}
-                    {isEditing && (<>
-                                      <input type="submit" value={"Сохранить"} disabled={isSubmitting} className={styles.edit_button}/>
-                                      <input type="button" onClick={resetEditing} value={"Отменить"} disabled={isSubmitting} className={styles.edit_button}/>
-                                   </>)}
-                </form>
+                        <p className={styles.file_error_msg}>{imageErrorMsg}</p>
+                        {isEditing && (<input type="button" onClick={() => setDoDelProfilePic(true)} value={"Удалить фото"} className={styles.edit_button}/>)}
+                        <div className={styles.nickname}><input
+                            placeholder={session.name}
+                            autoComplete="off"
+                            autoCorrect="off"
+                            className={styles.nickname_input}
+                            {...register("name", {
+                                required: "Введите никнейм",
+                                maxLength: {
+                                    value: 20,
+                                    message: "Значение должно быть короче 20 символов"
+                                },
+                                pattern: {
+                                    value: /^\S+$/,
+                                    message: "Никнейм не должен содержать пробелов"
+                                },
+                            })}
+                            disabled={!isEditing || isSubmitting}/>
+                            <p className={styles.error_msg}>{errors.name?.message ? errors.name?.message : ""}</p>
+                        </div>
+                        {!isEditing && (<input type="button" onClick={() => setIsEditing(true)} value={"Изменить"} className={styles.edit_button}/>)}
+                        {isEditing && (<>
+                                        <input type="submit" value={"Сохранить"} disabled={isSubmitting} className={styles.edit_button}/>
+                                        <input type="button" onClick={resetEditing} value={"Отменить"} disabled={isSubmitting} className={styles.edit_button}/>
+                                    </>)}
+                    </form>
+                </div>
             </div>
+            
         </div>
     );
 }

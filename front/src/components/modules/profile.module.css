@@ -33,6 +33,13 @@
     border-bottom: 3px solid #fff;
     overflow-y: scroll;
     left: -100%;
+    top: 0;
+}
+
+.hide_wrapper{
+    display: flex;
+    flex: 1;
+    overflow-y: hidden;
 }
 
 .scroll_wrapper{

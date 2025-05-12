@@ -4,6 +4,7 @@
     background-color: #000;
     border-right: 5px solid #000;
     border-bottom: 5px solid #000;
+    border-bottom-right-radius: 15px;
 }
 
 .search_block{
@@ -11,8 +12,6 @@
     display: grid;
     grid-template-columns: 60px 1fr;
     justify-items: center;
-    padding-right: 50px;
-    gap: 10px;
 }
 
 .chats_profile_toggle{
@@ -35,6 +34,7 @@
 
 .searchbar{
     display: flex;
+    width: calc(100% - 20px);
     flex-direction: row;
     align-items: center;
     gap: 5px;
@@ -65,6 +65,6 @@
 .panel_wrapper{
     position: relative;
     background-color: #fff;
-    border-top-right-radius: 50px;
-    border-bottom-right-radius: 50px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }

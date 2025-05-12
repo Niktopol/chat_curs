@@ -61,11 +61,11 @@ public class AuthService {
     }
 
     public String login(UserDTO userData, HttpServletRequest request, HttpServletResponse response) {
-        if (userData.getUsername().isEmpty()){
-            return "Нет имени пользователя";
+        if (!userData.isUsernameValid()){
+            return "Неверное имя пользователя";
         }
-        if (userData.getPassword().isEmpty()){
-            return "Нет пароля";
+        if (!userData.isPasswordValid()){
+            return "Неверный пароль";
         }
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 userData.getUsername(), userData.getPassword());

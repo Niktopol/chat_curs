@@ -80,8 +80,8 @@ export function RegForm() {
                         message: "Значение должно быть короче 20 символов"
                     },
                     pattern: {
-                        value: /^[A-Za-z0-9\-=_#+]+$/,
-                        message: "Допустимы только англ. буквы, цифры и -=_#+"
+                        value: /^[A-Za-z0-9\-_]+$/,
+                        message: "Допустимы только англ. буквы, цифры '-' и '_'"
                     },
                     onChange: () => clearErrors(["fail"])
                 })}
@@ -192,8 +192,8 @@ export function LoginForm() {
                         message: "Значение должно быть короче 20 символов"
                     },
                     pattern: {
-                        value: /^[A-Za-z0-9\-=_#+]+$/,
-                        message: "Допустимы только англ. буквы, цифры и -=_#+"
+                        value: /^[A-Za-z0-9\-_]+$/,
+                        message: "Допустимы только англ. буквы, цифры '-' и '_'"
                     },
                     onChange: () => clearErrors(["fail"])
                 })}

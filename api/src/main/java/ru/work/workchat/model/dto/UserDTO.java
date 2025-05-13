@@ -19,7 +19,7 @@ public class UserDTO {
     }
 
     public boolean isUsernameValid(){
-        return Pattern.matches("^[A-Za-z0-9\\-=_#+]+$", username) && !username.isEmpty() && username.length() <= 20;
+        return Pattern.matches("^[A-Za-z0-9\\-_]+$", username) && !username.isEmpty() && username.length() <= 20;
     }
 
     public boolean isPasswordValid(){

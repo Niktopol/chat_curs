@@ -28,11 +28,7 @@ export default function Chats(){
                         onChange={(e) => {
                             clearTimeout(timer);
                             const newTimer = setTimeout(() => {
-                                if (/^[A-Za-z0-9\-=_#+&$@]+$/.test(e.target.value)){
-                                    setSearchVal(e.target.value);
-                                } else {
-                                    setSearchVal("");
-                                }
+                                setSearchVal(e.target.value);
                             }, 250);
                             setTimer(newTimer);
                         }}

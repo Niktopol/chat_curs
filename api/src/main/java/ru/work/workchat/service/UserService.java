@@ -21,6 +21,11 @@ import java.io.InputStream;
 public class UserService {
     UserRepository userRepository;
 
+    public UserInfoDTO profileByUsername(String username){
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        return new UserInfoDTO(user.getName(), user.getUsername(), user.getIsOnline());
+    }
+
     public UserInfoDTO profile(){
         return new UserInfoDTO(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get());
     }
@@ -72,7 +77,6 @@ public class UserService {
         return "Фото профиля удалено";
     }
 
-    @Transactional
     public ImageFileDTO getProfilePicture(String username){
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
 

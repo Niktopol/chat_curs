@@ -16,11 +16,11 @@
 }
 
 .slide_left {
-    animation: slideLeft 0.2s forwards ease-out;
+    animation: slideLeft 0.1s forwards ease-out;
 }
 
 .slide_right {
-    animation: slideRight 0.2s forwards ease-out;
+    animation: slideRight 0.1s forwards ease-out;
 }
 
 .main{
@@ -34,6 +34,23 @@
     overflow-y: scroll;
     left: -100%;
     top: 0;
+    z-index: 2;
+}
+
+.logout{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 60px;
+    width: 60px;
+    padding: 15px;
+    cursor: pointer;
+}
+
+.logout_image{
+    height: 100%;
+    width: 100%;
+    color: #fff;
 }
 
 .hide_wrapper{
@@ -83,6 +100,7 @@
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    user-select: none;
 }
 
 .image_edit_cover{

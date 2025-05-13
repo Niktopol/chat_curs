@@ -3,6 +3,7 @@ package ru.work.workchat.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,12 +21,12 @@ public class AuthController {
     public ResponseEntity<OperationResultDTO> register(@RequestBody UserDTO userData){
         String resp = authService.register(userData);
         if(resp.isEmpty()){
-            return ResponseEntity.status(HttpServletResponse.SC_CREATED).body(new OperationResultDTO("Акаунт создан", null));
+            return ResponseEntity.status(HttpStatus.CREATED).body(new OperationResultDTO("Акаунт создан", null));
         }else{
             if (resp.equals("Произошла ошибка регистрации")){
-                return ResponseEntity.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).body(new OperationResultDTO(null, resp));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new OperationResultDTO(null, resp));
             } else {
-                return ResponseEntity.status(HttpServletResponse.SC_BAD_REQUEST).body(new OperationResultDTO(null, resp));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new OperationResultDTO(null, resp));
             }
         }
     }
@@ -36,7 +37,7 @@ public class AuthController {
         if(resp.isEmpty()){
             return ResponseEntity.ok(new OperationResultDTO("Вход выполнен", null));
         }else{
-            return ResponseEntity.status(HttpServletResponse.SC_BAD_REQUEST).body(new OperationResultDTO(null, resp));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new OperationResultDTO(null, resp));
         }
     }
 }

@@ -65,6 +65,6 @@
 .panel_wrapper{
     position: relative;
     background-color: #fff;
-    border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
+    overflow: hidden;
 }

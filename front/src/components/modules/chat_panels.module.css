@@ -4,6 +4,7 @@
     width: 100%;
     padding: 15px;
     overflow: hidden;
+    z-index: 0;
 }
 
 .scroll_wrapper{
@@ -57,6 +58,24 @@
     text-align: center;
 }
 
+.create_chat{
+    margin-left: auto;
+    width: 45px;
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.create_chat:hover{
+    background-color: #202020;
+}
+
+.create_chat_icon{
+    color: #fff;
+    width: 100%;
+    height: 100%;
+}
+
 .find_status{
     padding: 4px;
     background-color: #000;
@@ -64,4 +83,125 @@
     font-size: 18px;
     text-align: center;
     user-select: none;
+}
+
+@keyframes slideUp {
+    from {
+      bottom: calc(-100% + 45px);
+    }
+    to {
+      bottom: 0%;
+    }
+}
+@keyframes slideDown {
+    from {
+      bottom: 0%;
+    }
+    to {
+      bottom: calc(-100% + 45px);
+    }
+}
+
+.slide_up {
+    animation: slideUp 0.2s forwards ease-out;
+}
+
+.slide_down {
+    animation: slideDown 0.2s forwards ease-out;
+}
+
+.hidden{
+    display: none;
+}
+
+.chat_create_hide_wrapper{
+    position: absolute;
+    bottom: calc(-100% + 45px);
+    height: calc(100% - 45px);
+    width: 100%;
+    padding: 15px;
+    overflow: hidden;
+    background-color: #000;
+    z-index: 1;
+}
+
+.chat_create_scroll_wrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+}
+
+.chat_create_scroll_wrapper * {
+    flex-shrink: 0;
+}
+
+.chat_create_title{
+    padding: 10px;
+    font-size: 25px;
+    text-align: center;
+    color: #fff;
+}
+
+.chat_create_form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat_name{
+    position: relative;
+    background-color: #fff;
+    padding: 14px 16px;
+    width: 100%;
+}
+
+.chat_name_input{
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 2px solid #fff;
+    transition: border-bottom 0.2s;
+    text-overflow: ellipsis;
+}
+
+.chat_create_button:disabled, .chat_name_input:disabled{
+    color: #000;
+}
+
+.chat_name_input:not(:placeholder-shown), .chat_name_input:focus{
+    border-bottom: 2px solid #000
+}
+
+.error_msg {
+    position: absolute;
+    bottom: 0;
+    color: #f00;
+    font-size: 13px;
+}
+
+.chat_create_button{
+    font-size: 18px;
+    width: 150px;
+    padding: 8px;
+    border-radius: 20px;
+    background-color: #fff;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.chat_create_button:hover{
+    background-color: #cfcfcf;
+}
+
+.chat_create_button:active{
+    background-color: #b4b4b4;
 }

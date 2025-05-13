@@ -3,7 +3,7 @@
 import Image from "next/image";
 import styles from "./modules/profile.module.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileImport, faPen } from "@fortawesome/free-solid-svg-icons";
+import { faFileImport, faPen, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,6 +50,18 @@ export default function Profile({ hidden }){
         reset,
         formState: { errors, isSubmitting },
     } = useForm({defaultValues: {name: session.name}});
+
+    const logout = async () => {
+        try {
+            await fetch("http://localhost:8080/logout", {
+                method: "POST",
+                credentials: "include"
+            });
+            router.push("/login");
+        } catch (e) {
+            router.push("/login");
+        }
+    }
 
     const onSubmit = async (data) => {
         try {
@@ -99,6 +111,9 @@ export default function Profile({ hidden }){
 
     return (
         <div className={`${styles.main} ${hidden != null ? (hidden ? styles.slide_left : styles.slide_right) : ""}`}>
+            <div onClick={logout} className={styles.logout}>
+                <FontAwesomeIcon icon={faRightFromBracket} className={styles.logout_image}/>
+            </div>
             <div className={styles.hide_wrapper}>
                 <div className={styles.scroll_wrapper}>
                     <p className={styles.id}><span>@</span>{session.username}</p>

@@ -22,6 +22,11 @@ import java.io.IOException;
 public class UserController {
     UserService userService;
 
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<UserInfoDTO> profileByUsername(@PathVariable String username){
+        return ResponseEntity.ok(userService.profileByUsername(username));
+    }
+
     @GetMapping("/profile")
     public ResponseEntity<UserInfoDTO> profile(){
         return ResponseEntity.ok(userService.profile());

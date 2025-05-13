@@ -15,9 +15,8 @@ import ru.work.workchat.model.entity.key.ChatUserKey;
 @Table(name = "chat_member")
 public class ChatUser {
     public enum Role{
-        USER,
-        MODERATOR,
-        ADMIN
+        MEMBER,
+        OWNER
     }
 
     @EmbeddedId
@@ -36,4 +35,11 @@ public class ChatUser {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    public ChatUser(Chat chat, User user, Role role){
+        this.chat = chat;
+        this.user = user;
+        this.id = new ChatUserKey(chat.getId(), user.getId());
+        this.role = role;
+    }
 }

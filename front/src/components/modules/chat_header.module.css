@@ -42,7 +42,8 @@
     height: 100%;
     width: 100%;
     border-radius: 50%;
-    border: 3px solid #000;
+    background-color: #000;
+    border: 2px solid #000;
     overflow: hidden;
 }
 
@@ -66,6 +67,7 @@
     position: absolute;
     height: 100%;
     width: 100%;
+    overflow: hidden;
     padding: 50px;
     z-index: 2;
     background-color: #fff;
@@ -79,3 +81,54 @@
     width: 50px;
     cursor: pointer;
 }
+
+.scroll_wrapper{
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.user_info{
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    padding: 25px;
+    background-color: #000;
+    border-radius: 25px;
+}
+
+.user_image{
+    position: relative;
+    height: 150px;
+    width: 150px;
+    border: 3px solid #000;
+    border-radius: 50%;
+    overflow: hidden;
+    user-select: none;
+}
+
+.user_data{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    width: 550px;
+}
+
+.user_detail{
+    color: #cfcfcf;
+    font-size: 18px;
+}
+
+.user_name_wrapper{
+    padding: 15px 20px;
+    background-color: #fff;
+}
+
+.user_name{
+    font-size: 35px;
+    color: #000;
+    border-bottom: 3px solid #000;
+}
+    
+    

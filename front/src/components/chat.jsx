@@ -13,8 +13,8 @@ export function Chat(){
     const chat = useSelector((state) => state.chatSelected);
 
     return (
-        <div className={chatStyles.main} onClick={() => console.log(chat)}>
-            <ChatHeader name={chat.name}></ChatHeader>
+        <div className={chatStyles.main}>
+            { chat.id ? <ChatHeader id={chat.private} username={chat.username} name={chat.name} isPrivate={chat.private}></ChatHeader> : null }
         </div>
     );
 }

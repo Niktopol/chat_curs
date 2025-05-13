@@ -29,7 +29,7 @@ export default function ChatPanels({ searchVal }){
     } = useForm();
 
     const fetchChats = async () => {
-            if (session.username) {
+        if (session.username) {
             try {
                 const res = await fetch("http://localhost:8080/chats", {credentials: "include"});
 
@@ -90,7 +90,7 @@ export default function ChatPanels({ searchVal }){
 
     useEffect(() => {
         fetchChats();
-    }, [session]);
+    }, [session.username]);
 
     useEffect(() => {
         findChatsByName();

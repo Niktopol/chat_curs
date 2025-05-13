@@ -14,7 +14,7 @@ export function Chat(){
 
     return (
         <div className={chatStyles.main}>
-            { chat.id ? <ChatHeader id={chat.private} username={chat.username} name={chat.name} isPrivate={chat.private}></ChatHeader> : null }
+            { chat.id ? <ChatHeader id={chat.id} username={chat.username} name={chat.name} isPrivate={chat.private}></ChatHeader> : null }
         </div>
     );
 }

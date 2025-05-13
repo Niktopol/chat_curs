@@ -121,7 +121,7 @@
 
 .file_error_msg{
     font-size: 14px;
-    width: 80%;
+    max-width: 90%;
     color: #f00;
     text-align: center;
 }

@@ -97,7 +97,8 @@
     border-radius: 25px;
 }
 
-.user_image{
+.chat_image{
+    display: block;
     position: relative;
     height: 150px;
     width: 150px;
@@ -105,6 +106,7 @@
     border-radius: 50%;
     overflow: hidden;
     user-select: none;
+    cursor: pointer;
 }
 
 .user_data{
@@ -121,6 +123,7 @@
 }
 
 .user_name_wrapper{
+    position: relative;
     padding: 15px 20px;
     background-color: #fff;
 }
@@ -130,5 +133,101 @@
     color: #000;
     border-bottom: 3px solid #000;
 }
-    
-    
+
+.image_input_wrapper{
+    position: relative;
+}
+
+.image_edit_cover{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff00;
+    transition: background-color 0.2s;
+    z-index: 3;
+}
+
+.image_edit_cover:hover{
+    background-color: #ffffffb4;
+}
+
+.file_error_msg{
+    position: absolute;
+    bottom: 0;
+    transform: translateY(100%);
+    font-size: 11px;
+    width: 100%;
+    color: #f00;
+    text-align: center;
+}
+
+.disabled{
+    cursor: default;
+}
+
+.disabled .image_edit_cover{
+    display: none;
+}
+
+.image_edit_cover_icon{
+    width: 20%;
+    height: 20%;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.image_edit_cover:hover .image_edit_cover_icon{
+    opacity: 1;
+}
+
+.name_input{
+    width: 100%;
+    font-size: 35px;
+    background-color: transparent;
+    color: #000;
+    border: none;
+    outline: none;
+    border-bottom: 3px solid #fff;
+    transition: border-bottom 0.2s;
+    text-overflow: ellipsis;
+}
+
+.name_input:not(:placeholder-shown), .name_input:focus{
+    border-bottom: 3px solid #000
+}
+
+.error_msg {
+    position: absolute;
+    bottom: 0;
+    color: #f00;
+    font-size: 15px;
+}
+
+.buttons{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.edit_button{
+    font-size: 18px;
+    width: 150px;
+    padding: 8px;
+    border-radius: 20px;
+    background-color: #fff;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.edit_button:hover{
+    background-color: #cfcfcf;
+}
+
+.edit_button:active{
+    background-color: #b4b4b4;
+}

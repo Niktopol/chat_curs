@@ -104,6 +104,7 @@ export default function Profile({ hidden }){
             }
 
             dispatch(setData({name: data.name, image: userImage}));
+            setIsEditing(false);
         } catch (e) {
             router.push("/login");
         }
@@ -120,11 +121,11 @@ export default function Profile({ hidden }){
                     <form className={styles.edit_form} onSubmit={handleSubmit(onSubmit)}>
                         <div className={styles.image_wrapper}>
                             <label htmlFor="profileimage" className={`${styles.image} ${!isEditing ? styles.disabled: ""}`}>
-                            <Image src={userImage} alt="" fill draggable={false} style={{objectFit: "cover", zIndex: 2}}></Image>
-                            <div className={styles.image_edit_cover}>
-                                <FontAwesomeIcon icon={faFileImport} className={styles.image_edit_cover_icon} />
-                            </div>
-                        </label>
+                                <Image src={userImage} alt="" fill draggable={false} style={{objectFit: "cover", zIndex: 2}}></Image>
+                                <div className={styles.image_edit_cover}>
+                                    <FontAwesomeIcon icon={faFileImport} className={styles.image_edit_cover_icon} />
+                                </div>
+                            </label>
                         </div>
                         <input type="file"
                         accept="image/jpeg"
@@ -132,7 +133,6 @@ export default function Profile({ hidden }){
                         style={{display: "none"}}
                         {...register("file", {
                             onChange: (e) => {
-                                URL.revokeObjectURL(userImage);
                                 if (e.target.files[0].size < 5 * 1024 * 1024) {
                                     setUserImage(URL.createObjectURL(e.target.files[0]));
                                     setDoDelProfilePic(false);

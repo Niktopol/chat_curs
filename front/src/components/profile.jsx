@@ -96,7 +96,7 @@ export default function Profile({ hidden }){
                 method: "PATCH",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: data.name }),
+                body: JSON.stringify({ value: data.name }),
             });
 
             if (!res.ok) {

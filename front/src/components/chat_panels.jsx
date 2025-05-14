@@ -196,11 +196,11 @@ export default function ChatPanels({ searchVal }){
                             {...register("name", {
                                 required: "Введите название чата",
                                 maxLength: {
-                                    value: 50,
-                                    message: "Значение должно быть короче 50 символов"
+                                    value: 30,
+                                    message: "Значение должно быть короче 30 символов"
                                 },
                                 pattern: {
-                                    value: /\S/,
+                                    value: /^.*\S.*$/,
                                     message: "Некорректное название чата"
                                 },
                             })}

@@ -8,10 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.work.workchat.model.dto.ImageFileDTO;
-import ru.work.workchat.model.dto.OperationResultDTO;
-import ru.work.workchat.model.dto.ProfileEditDTO;
-import ru.work.workchat.model.dto.UserInfoDTO;
+import ru.work.workchat.model.dto.*;
 import ru.work.workchat.service.UserService;
 
 import java.io.IOException;
@@ -33,8 +30,8 @@ public class UserController {
     }
 
     @PatchMapping("/profile")
-    public ResponseEntity<OperationResultDTO> editProfile(@RequestBody ProfileEditDTO profile){
-        return ResponseEntity.ok(new OperationResultDTO(userService.editProfile(profile), null));
+    public ResponseEntity<OperationResultDTO> editProfileName(@RequestBody StringDTO name){
+        return ResponseEntity.ok(new OperationResultDTO(userService.editProfile(name), null));
     }
 
     @GetMapping("/profilepic/{username}")

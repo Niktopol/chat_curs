@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.work.workchat.configuration.excepion.ImageNotFoundException;
 import ru.work.workchat.configuration.excepion.UserNotFoundException;
 import ru.work.workchat.model.dto.ImageFileDTO;
-import ru.work.workchat.model.dto.ProfileEditDTO;
+import ru.work.workchat.model.dto.StringDTO;
 import ru.work.workchat.model.dto.UserInfoDTO;
 import ru.work.workchat.model.entity.User;
 import ru.work.workchat.repository.UserRepository;
@@ -31,9 +31,13 @@ public class UserService {
     }
 
     @Transactional
-    public String editProfile(ProfileEditDTO profile){
+    public String editProfile(StringDTO name){
         User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get();
-        user.setName(profile.getName());
+
+        if (!name.doMatch("^\\S+$", 1, 20)) {
+            throw new IllegalArgumentException("Неверное имя пользователя");
+        }
+        user.setName(name.getValue());
         userRepository.save(user);
 
         return "Данные профиля обновлены";

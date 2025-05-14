@@ -22,7 +22,7 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 50)
+    @Column(length = 30)
     private String name;
 
     @Column(nullable = false)

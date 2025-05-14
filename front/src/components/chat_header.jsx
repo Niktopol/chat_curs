@@ -4,8 +4,9 @@ import Image from "next/image";
 import styles from "./modules/chat_header.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileImport, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 export default function ChatHeader({ id, username, name, isPrivate }){
     const [editOpen, setEditOpen] = useState(false);
@@ -16,6 +17,8 @@ export default function ChatHeader({ id, username, name, isPrivate }){
     const [doDelChatPic, setDoDelChatPic] = useState(false);
     const [imageErrorMsg, setImageErrorMsg] = useState("");
     const [currentName, setCurrentName] = useState(name);
+    const input = useRef();
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -25,6 +28,10 @@ export default function ChatHeader({ id, username, name, isPrivate }){
     } = useForm({defaultValues: {name: name}});
 
     const resetEditing = (newImg, newName=currentName) => {
+        if (input.current) {
+            input.current.focus();
+            input.current.setSelectionRange(0, 0);
+        }
         setIsEditing(false);
         setImageErrorMsg("");
         setChatImage(newImg);
@@ -96,7 +103,49 @@ export default function ChatHeader({ id, username, name, isPrivate }){
     }, [id, username]);
 
     const onSubmit = async (data) => {
-        resetEditing(newChatImage, data.name);
+        try {
+            if (data.file && data.file.length) {
+                const formData = new FormData();
+                formData.append('file', data.file[0]);
+                const res = await fetch(`http://localhost:8080/chats/image/${id}`, {
+                    method: "PATCH",
+                    credentials: "include",
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    setNewChatImage(chatImage);
+                    setValue("file", null);
+                    setImageErrorMsg((await res.json())?.error);
+                    return;
+                }
+
+            } else if (doDelChatPic) {
+                const res = await fetch(`http://localhost:8080/chats/image/${id}`, {
+                    method: "DELETE",
+                    credentials: "include"
+                });
+
+                if (!res.ok) {
+                    throw new Error((await res.json())?.error);
+                }
+            }
+
+            const res = await fetch(`http://localhost:8080/chats/${id}`, {
+                method: "PATCH",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ value: data.name }),
+            });
+
+            if (!res.ok) {
+                throw new Error((await res.json())?.error);
+            }
+
+            resetEditing(newChatImage, data.name);
+        } catch (e) {
+            router.push("/login");
+        }
     }
 
     return (
@@ -177,6 +226,7 @@ export default function ChatHeader({ id, username, name, isPrivate }){
                                 </div>
                                 <div className={styles.user_data}>
                                     <div className={styles.user_name_wrapper}><input
+                                        ref={input}
                                         placeholder={currentName}
                                         autoComplete="off"
                                         autoCorrect="off"
@@ -184,8 +234,8 @@ export default function ChatHeader({ id, username, name, isPrivate }){
                                         {...register("name", {
                                             required: "Введите название чата",
                                             maxLength: {
-                                                value: 50,
-                                                message: "Значение должно быть короче 50 символов"
+                                                value: 30,
+                                                message: "Значение должно быть короче 30 символов"
                                             },
                                             pattern: {
                                                 value: /\S/,

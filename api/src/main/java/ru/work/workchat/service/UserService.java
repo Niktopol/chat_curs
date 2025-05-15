@@ -23,7 +23,7 @@ public class UserService {
 
     public UserInfoDTO profileByUsername(String username){
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-        return new UserInfoDTO(user.getName(), user.getUsername(), user.getIsOnline());
+        return new UserInfoDTO(null, user.getName(), user.getUsername(), null, user.getIsOnline());
     }
 
     public UserInfoDTO profile(){

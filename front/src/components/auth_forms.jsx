@@ -81,7 +81,7 @@ export function RegForm() {
                     },
                     pattern: {
                         value: /^[A-Za-z0-9\-_]+$/,
-                        message: "Допустимы только англ. буквы, цифры '-' и '_'"
+                        message: "Допустимы только англ. буквы, цифры, '-' и '_'"
                     },
                     onChange: () => clearErrors(["fail"])
                 })}
@@ -193,7 +193,7 @@ export function LoginForm() {
                     },
                     pattern: {
                         value: /^[A-Za-z0-9\-_]+$/,
-                        message: "Допустимы только англ. буквы, цифры '-' и '_'"
+                        message: "Допустимы только англ. буквы, цифры, '-' и '_'"
                     },
                     onChange: () => clearErrors(["fail"])
                 })}

@@ -14,7 +14,7 @@ export function Chat(){
 
     return (
         <div className={chatStyles.main}>
-            { chat.id ? <ChatHeader id={chat.id} username={chat.username} name={chat.name} isPrivate={chat.private}></ChatHeader> : null }
+            { chat.id ? <ChatHeader></ChatHeader> : null }
         </div>
     );
 }
@@ -22,6 +22,7 @@ export function Chat(){
 export function ChatPanel({ data }){
     const [lastMsg, setLastMsg] = useState("");
     const [chatPic, setChatPic] = useState("/default_user.svg");
+    const websocket = useSelector((state) => state.websocketMessage);
     const dispatch = useDispatch();
     const router = useRouter();
 
@@ -52,7 +53,7 @@ export function ChatPanel({ data }){
             }
         }
         try {
-            if (data.new) {
+            if (data.private) {
                 userPicFetch();
             } else {
                 chatPicFetch();
@@ -61,6 +62,12 @@ export function ChatPanel({ data }){
             router.push("/login");
         }
     }, [data]);
+
+    useEffect(() => {
+        if (websocket.message?.title === "Chat info updated" && !data.isPrivate && websocket.message.id == data.id ) {
+            setChat({...data, image: chatPic});
+        }
+    }, [websocket])
 
     const selectChat = async () => {
         dispatch(setChat(data));

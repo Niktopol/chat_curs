@@ -1,0 +1,69 @@
+.main{
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    padding: 20px 30px;
+    background-color: #000;
+    border-radius: 25px;
+}
+
+.at{
+    display: block;
+    font-size: 18px;
+    border-bottom: 2px solid #fff;
+}
+
+.name{
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    background-color: #fff;
+    padding: 14px 16px;
+    flex-grow: 1;
+}
+
+.name_input{
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 16px;
+    border-bottom: 2px solid #fff;
+    transition: border-bottom 0.2s;
+    text-overflow: ellipsis;
+}
+
+.name_input:not(:placeholder-shown), .name_input:focus{
+    border-bottom: 2px solid #000
+}
+
+.error_msg{
+    position: absolute;
+    bottom: 0;
+    color: #f00;
+    font-size: 13px;
+}
+
+.edit_button{   
+    font-size: 16px;
+    width: 220px;
+    padding: 6px;
+    border-radius: 20px;
+    background-color: #fff;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.edit_button:hover{
+    background-color: #cfcfcf;
+}
+
+.edit_button:active{
+    background-color: #b4b4b4;
+}
+
+.edit_button:disabled, .name_input:disabled{
+    color: #000;
+}

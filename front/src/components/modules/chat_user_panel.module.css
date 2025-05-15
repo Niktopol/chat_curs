@@ -1,0 +1,101 @@
+.main{
+    background-color: #000;
+    border-radius: 10px;
+}
+
+.details{
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    border: 3px solid #000;
+    border-radius: 10px;
+    transform: translate(0, -7px);
+}
+
+.image{
+    height: 54px;
+    width: 54px;
+    padding: 5px;
+}
+
+.image_wrapper{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    border: 2px solid #000;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.user_info{
+    flex-grow: 1;
+}
+
+.info{
+    color: #6d6d6d;
+    font-size: 13px;
+}
+
+.name{
+    font-size: 18px;
+}
+
+.role{
+    font-size: 13px;
+    padding: 1px 8px;
+    margin: 0 2px;
+    color: #fff;
+    background-color: #000;
+    border-radius: 10px;
+}
+
+.context_wrapper{
+    position: relative;
+}
+
+.actions{
+    height: 54px;
+    width: 54px;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.actions:hover{
+    background-color: #e2e2e2;
+}
+
+.actions_icon{
+    height: 100%;
+    width: 100%;
+    color: #000;
+}
+
+.context{
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    transform: translateX(-100%);
+    background-color: #fff;
+    box-shadow: 0 0 5px #9c9c9c;
+}
+
+.context_option{
+    color: #f00;
+    font-size: 14px;
+    width: 160px;
+    padding: 10px;
+    transition: background-color 0.2s;
+    user-select: none;
+    cursor: pointer;
+}
+
+.context_option:hover{
+    background-color: #cfcfcf;
+}
+
+.context_option:active{
+    background-color: #b4b4b4;
+}

@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 
 export default function ChatPanels({ searchVal }){
     const session = useSelector((state) => state.userSession);
+    const websocket = useSelector((state) => state.websocketMessage);
     const [chats, setChats] = useState({your: [], found: []});
     const [userChats, setUserChats] = useState(null);
     const [userFilterOption, setUserFilterOption] = useState(false);
@@ -87,6 +88,12 @@ export default function ChatPanels({ searchVal }){
             }
         }
     }
+
+    useEffect(() => {
+        if (websocket.message?.title === "Chat info updated"){
+            fetchChats();
+        }
+    }, [websocket])
 
     useEffect(() => {
         fetchChats();

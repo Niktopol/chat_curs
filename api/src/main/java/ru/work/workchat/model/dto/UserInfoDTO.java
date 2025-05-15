@@ -11,8 +11,10 @@ import ru.work.workchat.model.entity.User;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserInfoDTO {
+    private Long id;
     private String name;
     private String username;
+    private Boolean isOwner;
     private Boolean isOnline;
 
     public UserInfoDTO(User user){

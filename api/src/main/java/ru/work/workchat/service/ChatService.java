@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.work.workchat.configuration.excepion.ChatNotFoundException;
 import ru.work.workchat.configuration.excepion.ImageNotFoundException;
 import ru.work.workchat.configuration.excepion.NoAuthorityException;
+import ru.work.workchat.configuration.excepion.UserNotFoundException;
 import ru.work.workchat.model.dto.*;
 import ru.work.workchat.model.entity.Chat;
 import ru.work.workchat.model.entity.ChatUser;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static ru.work.workchat.model.entity.ChatUser.Role.MEMBER;
 import static ru.work.workchat.model.entity.ChatUser.Role.OWNER;
 
 @AllArgsConstructor
@@ -36,6 +38,22 @@ public class ChatService {
     UserRepository userRepository;
     ChatRepository chatRepository;
     ChatUserRepository chatUserRepository;
+    SimpMessagingTemplate messagingTemplate;
+
+    private void sendChatUpdatedMessage(Long id, String extraUsername){
+        ArrayList<String> users = new ArrayList<>(chatUserRepository.findByChatIdOrderByUser_Name(id).stream().map(
+                (user) -> user.getUser().getUsername()).toList());
+        if (extraUsername != null){
+            users.add(extraUsername);
+        }
+        for (String user : users){
+            messagingTemplate.convertAndSendToUser(
+                user,
+                "/queue/messages",
+                new WebSocketMessageDTO("Chat info updated", id, null)
+            );
+        }
+    }
 
     public UserChatsDTO getChats() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -77,6 +95,12 @@ public class ChatService {
     }
 
     public ImageFileDTO getChatPicture(Long id){
+        if(chatUserRepository.findByChatIdAndUser_Username(
+                id,
+                SecurityContextHolder.getContext().getAuthentication().getName()).isEmpty()){
+            throw new ChatNotFoundException("Чат не найден");
+        }
+
         byte[] imageData = chatRepository.findById(id).orElseThrow(() -> new ChatNotFoundException("Чат не найден")).getChatPic();
 
         if (imageData == null || imageData.length == 0) {
@@ -138,11 +162,13 @@ public class ChatService {
                 || (originalFilename != null
                 && !originalFilename.toLowerCase().endsWith(".jpg")
                 && !originalFilename.toLowerCase().endsWith(".jpeg"))) {
-            throw new IllegalArgumentException("Неподдерживаемый формат фото");
+            throw new IllegalArgumentException("Неподдерживаемый формат");
         }
 
         chat.setChatPic(file.getBytes());
         chatRepository.save(chat);
+
+        sendChatUpdatedMessage(chatId, null);
 
         return "Фото чата изменено";
     }
@@ -159,6 +185,8 @@ public class ChatService {
         chat.setName(name.getValue());
         chatRepository.save(chat);
 
+        sendChatUpdatedMessage(chatId, null);
+
         return "Имя чата изменено";
     }
 
@@ -170,7 +198,135 @@ public class ChatService {
         chat.setChatPic(null);
         chatRepository.save(chat);
 
+        sendChatUpdatedMessage(chatId, null);
+
         return "Фото чата удалено";
+    }
+
+    public List<UserInfoDTO> getChatUsers(Long chatId){
+        if(chatUserRepository.findByChatIdAndUser_Username(
+                chatId,
+                SecurityContextHolder.getContext().getAuthentication().getName()).isEmpty()){
+            throw new ChatNotFoundException("Чат не найден");
+        }
+
+        List<ChatUser> users = chatUserRepository.findByChatIdOrderByUser_Name(chatId);
+
+        if (users.isEmpty()){
+            throw new ChatNotFoundException("Чат не найден");
+        }
+
+        return users.stream().map((user) -> new UserInfoDTO(
+                user.getUser().getId(),
+                user.getUser().getName(),
+                user.getUser().getUsername(),
+                user.getRole() == OWNER,
+                user.getUser().getIsOnline())).toList();
+    }
+
+    @Transactional
+    public String addChatUser(StringDTO username, Long chatId){
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException("Чат не найден"));
+        checkChatEditAuthority(chatId);
+
+        if (!username.doMatch("^[A-Za-z0-9\\-_]+$", 1, 20)){
+            throw new IllegalArgumentException("Неверное имя пользователя");
+        }
+
+        if (chatUserRepository.findByChatIdAndUser_Username(chatId, username.getValue()).isPresent()){
+            throw new IllegalArgumentException("Пользователь уже добавлен");
+        }
+
+        ChatUser user = new ChatUser(
+                chat,
+                userRepository.findByUsername(username.getValue()).orElseThrow(
+                        () -> new UserNotFoundException("Пользователь не найден")
+                ),
+                MEMBER);
+
+        chatUserRepository.save(user);
+
+        sendChatUpdatedMessage(chatId, username.getValue());
+
+        return "Пользователь добавлен";
+    }
+
+    @Transactional
+    public String deleteChatUser(StringDTO username, Long chatId){
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException("Чат не найден"));
+
+        if (chat.isPrivate()){
+            throw new ChatNotFoundException("Чат не найден");
+        }
+
+        if (!username.doMatch("^[A-Za-z0-9\\-_]+$", 1, 20)){
+            throw new IllegalArgumentException("Неверное имя пользователя");
+        }
+
+        if (!SecurityContextHolder.getContext().getAuthentication().getName().equals(username.getValue())) {
+            checkChatEditAuthority(chatId);
+        }
+
+        if (chatUserRepository.findByChatIdAndUser_Username(chatId, username.getValue()).isEmpty()){
+            throw new IllegalArgumentException("Пользователь не является учатсником чата");
+        }
+
+        List<ChatUser> users = chatUserRepository.findByChatIdOrderByUser_Name(chatId);
+
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getUser().getUsername().equals(username.getValue())){
+                chatUserRepository.delete(users.get(i));
+                users.remove(i);
+                break;
+            }
+        }
+
+        if (users.isEmpty()){
+            chatRepository.delete(chat);
+        } else {
+            boolean hasOwner = false;
+            for (ChatUser user : users) {
+                if (user.getRole() == OWNER) {
+                    hasOwner = true;
+                    break;
+                }
+            }
+            if (!hasOwner){
+                users.get(0).setRole(OWNER);
+                chatUserRepository.save(users.get(0));
+            }
+        }
+        sendChatUpdatedMessage(chatId, username.getValue());
+
+        return "Участник чата удалён";
+    }
+
+    @Transactional
+    public String setChatOwner(StringDTO username, Long chatId){
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException("Чат не найден"));
+        checkChatEditAuthority(chatId);
+
+        if (!username.doMatch("^[A-Za-z0-9\\-_]+$", 1, 20)){
+            throw new IllegalArgumentException("Неверное имя пользователя");
+        }
+
+        ChatUser user = chatUserRepository.findByChatIdAndUser_Username(chatId, username.getValue())
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не является учатсником чата"));
+
+        ChatUser admin = chatUserRepository.findByChatIdAndUser_Username(
+                chatId,
+                SecurityContextHolder.getContext().getAuthentication().getName()
+        ).get();
+
+        admin.setRole(MEMBER);
+        user.setRole(OWNER);
+
+        chatUserRepository.save(admin);
+        chatUserRepository.save(user);
+
+        sendChatUpdatedMessage(chatId, username.getValue());
+
+        return "Владелец чата изменён";
     }
 }
 

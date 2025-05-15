@@ -1,14 +1,22 @@
 "use client"
+"use strict"
 
 import Image from "next/image";
 import styles from "./modules/chat_header.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileImport, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { setChat, setUsers } from "@/store/chatSelectedSlice";
+import ChatUserPanel from "./chat_user_panel";
+import ChatUserAddInput from "./chat_user_add_input";
 
-export default function ChatHeader({ id, username, name, isPrivate }){
+export default function ChatHeader(){
+    const session = useSelector((state) => state.userSession);
+    const chat = useSelector((state) => state.chatSelected);
+    const websocket = useSelector((state) => state.websocketMessage);
     const [editOpen, setEditOpen] = useState(false);
     const [chatImage, setChatImage] = useState("/default_user.svg");
     const [newChatImage, setNewChatImage] = useState("/default_user.svg");
@@ -17,7 +25,8 @@ export default function ChatHeader({ id, username, name, isPrivate }){
     const [doDelChatPic, setDoDelChatPic] = useState(false);
     const [imageErrorMsg, setImageErrorMsg] = useState("");
     const [currentName, setCurrentName] = useState(name);
-    const input = useRef();
+    const [isChatOwner, setIsChatOwner] = useState(false);
+    const dispatch = useDispatch();
     const router = useRouter();
     const {
         register,
@@ -25,13 +34,14 @@ export default function ChatHeader({ id, username, name, isPrivate }){
         setValue,
         reset,
         formState: { errors, isSubmitting },
-    } = useForm({defaultValues: {name: name}});
+    } = useForm({defaultValues: {name: chat.name}});
+
+
+    useEffect(() => {
+        console.log(chat.name);
+    }, [chat.name]);
 
     const resetEditing = (newImg, newName=currentName) => {
-        if (input.current) {
-            input.current.focus();
-            input.current.setSelectionRange(0, 0);
-        }
         setIsEditing(false);
         setImageErrorMsg("");
         setChatImage(newImg);
@@ -44,7 +54,7 @@ export default function ChatHeader({ id, username, name, isPrivate }){
     useEffect(() => {
         return () => {
             if (chatImage.startsWith('blob:')) {
-                if (chatImage) URL.revokeObjectURL(chatImage);
+                URL.revokeObjectURL(chatImage);
             }
         }
     }, [chatImage]);
@@ -54,60 +64,98 @@ export default function ChatHeader({ id, username, name, isPrivate }){
     }, [doDelChatPic]);
 
     useEffect(() => {
-        const chatPicFetch = async () => {
-            const chatpic_resp = await fetch(`http://localhost:8080/chats/image/${id}`, {credentials: "include"});
+        let isOwner = false;
+        for (let i = 0; i < chat.users.length; i++){
+            if (chat.users[i]?.isOwner && chat.users[i].username === session.username){
+                isOwner = true;
+                break;
+            }
+        }
+        setIsChatOwner(isOwner);
 
-            if (chatpic_resp.ok) {
-                const blob = await chatpic_resp.blob();
-                const url = URL.createObjectURL(blob)
-                setChatImage(url);
-                setNewChatImage(url);
+        if (chat.users) {
+            setChatInfo(`Участников: ${chat.users.length}`);
+        }
+    }, [chat.users])
+
+    useEffect(() => {
+        const chatPicFetch = async () => {
+            try {
+                const chatpic_resp = await fetch(`http://localhost:8080/chats/image/${chat.id}`, {credentials: "include"});
+
+                if (chatpic_resp.ok) {
+                    const blob = await chatpic_resp.blob();
+                    const url = URL.createObjectURL(blob)
+                    setChatImage(url);
+                    setNewChatImage(url);
+                }
+            } catch (e) {
+                router.push("/login");
+            }
+        }
+
+        const chatUsersFetch = async () => {
+            try {
+                const chat_users_resp = await fetch(`http://localhost:8080/chats/users/${chat.id}`, {credentials: "include"});
+            
+                if (chat_users_resp.ok) {
+                    dispatch(setUsers(await chat_users_resp.json()));
+                } else {
+                    throw new Error((await chat_users_resp.json())?.error);
+                }
+            } catch (e) {
+                router.push("/login");
             }
         }
 
         const userPicFetch = async () => {
-            const userpic_resp = await fetch(`http://localhost:8080/user/profilepic/${encodeURIComponent(username)}`, {credentials: "include"});
+            try {
+                const userpic_resp = await fetch(`http://localhost:8080/user/profilepic/${encodeURIComponent(chat.username)}`, {credentials: "include"});
 
-            if (userpic_resp.ok) {
-                const blob = await userpic_resp.blob();
-                setChatImage(URL.createObjectURL(blob));
+                if (userpic_resp.ok) {
+                    const blob = await userpic_resp.blob();
+                    setChatImage(URL.createObjectURL(blob));
+                }
+            } catch (e) {
+                router.push("/login");
             }
         }
 
         const userStatusFetch = async () => {
-            const user_resp = await fetch(`http://localhost:8080/user/profile/${encodeURIComponent(username)}`, {credentials: "include"});
+            try {
+                const user_resp = await fetch(`http://localhost:8080/user/profile/${encodeURIComponent(chat.username)}`, {credentials: "include"});
 
-            if (user_resp.ok) {
-                setChatInfo((await user_resp.json()).isOnline ? "В сети" : "Не в сети")
-            } else {
-                throw new Error((await res.json())?.error);
+                if (user_resp.ok) {
+                    setChatInfo((await user_resp.json()).isOnline ? "В сети" : "Не в сети")
+                } else {
+                    throw new Error((await res.json())?.error);
+                }
+            } catch (e) {
+                router.push("/login");
             }
         }
     
         setEditOpen(false);
         setChatImage();
-        resetEditing("/default_user.svg", name);
+        resetEditing("/default_user.svg", chat.name);
         setChatInfo(" ");
         
-        try {
-            if (isPrivate) {
-                userPicFetch();
-                userStatusFetch();
-            } else {
-                chatPicFetch();
-            }
-        } catch (e) {
-            router.push("/login");
+        if (chat.private) {
+            userPicFetch();
+            userStatusFetch();
+        } else {
+            chatPicFetch();
+            chatUsersFetch();
         }
         
-    }, [id, username]);
+    }, [chat.id, chat.username]);
 
     const onSubmit = async (data) => {
         try {
             if (data.file && data.file.length) {
                 const formData = new FormData();
                 formData.append('file', data.file[0]);
-                const res = await fetch(`http://localhost:8080/chats/image/${id}`, {
+                const res = await fetch(`http://localhost:8080/chats/image/${chat.id}`, {
                     method: "PATCH",
                     credentials: "include",
                     body: formData
@@ -121,7 +169,7 @@ export default function ChatHeader({ id, username, name, isPrivate }){
                 }
 
             } else if (doDelChatPic) {
-                const res = await fetch(`http://localhost:8080/chats/image/${id}`, {
+                const res = await fetch(`http://localhost:8080/chats/image/${chat.id}`, {
                     method: "DELETE",
                     credentials: "include"
                 });
@@ -131,7 +179,7 @@ export default function ChatHeader({ id, username, name, isPrivate }){
                 }
             }
 
-            const res = await fetch(`http://localhost:8080/chats/${id}`, {
+            const res = await fetch(`http://localhost:8080/chats/${chat.id}`, {
                 method: "PATCH",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -143,6 +191,30 @@ export default function ChatHeader({ id, username, name, isPrivate }){
             }
 
             resetEditing(newChatImage, data.name);
+        } catch (e) {
+            router.push("/login");
+        }
+    }
+
+    const leaveChat = async () => {
+        try {
+            const leave_chat_resp = await fetch(`http://localhost:8080/chats/users/${chat.id}/delete`, {
+                method: "PATCH",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({value: session.username}),
+            });
+            if (!leave_chat_resp.ok){
+                router.push("/login");
+            } else {
+                dispatch(setChat({
+                    id: null,
+                    username: "",
+                    name: "",
+                    private: null,
+                    new: null
+                }));
+            }
         } catch (e) {
             router.push("/login");
         }
@@ -164,88 +236,87 @@ export default function ChatHeader({ id, username, name, isPrivate }){
                 </div>
                 <div className={styles.background}></div>
             </div>
-            { editOpen ? 
-                <div className={styles.chat_edit}>
-                    <FontAwesomeIcon icon={faXmark} onClick={() => setEditOpen(false)} className={styles.close} />
-                    { isPrivate ? 
-                        (<div className={styles.scroll_wrapper}>
-                            <div className={styles.user_info}>
-                                <div className={`${styles.chat_image} ${styles.disabled}`}>
-                                    <Image src={chatImage} alt="" fill draggable={false} style={{objectFit: "cover"}}></Image>
-                                </div>
-                                <div className={styles.user_data}>
-                                    <p className={styles.user_detail}><span>@</span>{username}</p>
-                                    <div className={styles.user_name_wrapper}>
-                                        <p className={styles.user_name}>{name}</p>
-                                    </div>
-                                    <p className={styles.user_detail}>{chatInfo}</p>
-                                </div>
+            <div className={styles.chat_edit} style={editOpen ? null : {display: "none"}}>
+                <FontAwesomeIcon icon={faXmark} onClick={() => setEditOpen(false)} className={styles.close} />
+                { chat.private ? 
+                    (<div className={styles.scroll_wrapper}>
+                        <div className={styles.user_info}>
+                            <div className={`${styles.chat_image} ${styles.disabled}`}>
+                                <Image src={chatImage} alt="" fill draggable={false} style={{objectFit: "cover"}}></Image>
                             </div>
-                        </div>) :
-                        (<div className={styles.scroll_wrapper}>
-                            <form onSubmit={handleSubmit(onSubmit)} className={styles.user_info}>
-                                <div className={styles.image_input_wrapper}>
-                                    <label htmlFor="chatimage" className={`${styles.chat_image} ${!isEditing ? styles.disabled: ""}`}>
-                                        <Image src={newChatImage} alt="" fill draggable={false} style={{objectFit: "cover"}}></Image>
-                                        <div className={styles.image_edit_cover}>
-                                            <FontAwesomeIcon icon={faFileImport} className={styles.image_edit_cover_icon} />
-                                        </div>
-                                    </label>
-                                    <input type="file"
-                                    accept="image/jpeg"
-                                    id="chatimage"
-                                    style={{display: "none"}}
-                                    {...register("file", {
-                                        onChange: (e) => {
-                                            if (e.target.files[0].size < 5 * 1024 * 1024) {
-                                                setNewChatImage(URL.createObjectURL(e.target.files[0]));
-                                                setDoDelChatPic(false);
-                                                setImageErrorMsg("")
-                                            } else {
-                                                setNewChatImage(chatImage);
-                                                setValue("file", null);
-                                                setImageErrorMsg("Размер изображения > 5 МБ")
-                                            }
-                                        },
-                                        validate: {
-                                            lessThan5MB: (fileList) => {
-                                                if (fileList){
-                                                    if (fileList[0]?.size > 5 * 1024 * 1024) {
-                                                        setImageErrorMsg("Размер изображения > 5 МБ")
-                                                        return "Размер изображения больше 5 МБ";
-                                                    } else {
-                                                        setImageErrorMsg("")
-                                                        return true;
-                                                    }
+                            <div className={styles.user_data}>
+                                <p className={styles.user_detail}><span>@</span>{chat.username}</p>
+                                <div className={styles.user_name_wrapper}>
+                                    <p className={styles.user_name}>{currentName}</p>
+                                </div>
+                                <p className={styles.user_detail}>{chatInfo}</p>
+                            </div>
+                        </div>
+                    </div>) :
+                    (<div className={styles.scroll_wrapper}>
+                        <form onSubmit={handleSubmit(onSubmit)} className={styles.user_info}>
+                            <div className={styles.image_input_wrapper}>
+                                <label htmlFor="chatimage" className={`${styles.chat_image} ${!isEditing ? styles.disabled: ""}`}>
+                                    <Image src={newChatImage} alt="" fill draggable={false} style={{objectFit: "cover"}}></Image>
+                                    <div className={styles.image_edit_cover}>
+                                        <FontAwesomeIcon icon={faFileImport} className={styles.image_edit_cover_icon} />
+                                    </div>
+                                </label>
+                                <input type="file"
+                                accept="image/jpeg"
+                                id="chatimage"
+                                style={{display: "none"}}
+                                {...register("file", {
+                                    onChange: (e) => {
+                                        if (e.target.files[0].size < 5 * 1024 * 1024) {
+                                            setNewChatImage(URL.createObjectURL(e.target.files[0]));
+                                            setDoDelChatPic(false);
+                                            setImageErrorMsg("")
+                                        } else {
+                                            setNewChatImage(chatImage);
+                                            setValue("file", null);
+                                            setImageErrorMsg("Размер изображения > 5 МБ")
+                                        }
+                                    },
+                                    validate: {
+                                        lessThan5MB: (fileList) => {
+                                            if (fileList){
+                                                if (fileList[0]?.size > 5 * 1024 * 1024) {
+                                                    setImageErrorMsg("Размер изображения > 5 МБ")
+                                                    return "Размер изображения больше 5 МБ";
+                                                } else {
+                                                    setImageErrorMsg("")
+                                                    return true;
                                                 }
                                             }
+                                        }
+                                    },
+                                })}
+                                disabled={!isEditing || isSubmitting}/>
+                                <p className={styles.file_error_msg}>{imageErrorMsg}</p>
+                            </div>
+                            <div className={styles.user_data}>
+                                <div className={styles.user_name_wrapper}><input
+                                    placeholder={currentName}
+                                    autoComplete="off"
+                                    autoCorrect="off"
+                                    className={styles.name_input}
+                                    {...register("name", {
+                                        required: "Введите название чата",
+                                        maxLength: {
+                                            value: 30,
+                                            message: "Значение должно быть короче 30 символов"
+                                        },
+                                        pattern: {
+                                            value: /^.*\S.*$/,
+                                            message: "Некорректное название чата"
                                         },
                                     })}
                                     disabled={!isEditing || isSubmitting}/>
-                                    <p className={styles.file_error_msg}>{imageErrorMsg}</p>
+                                    <p className={styles.error_msg}>{errors.name?.message ? errors.name?.message : ""}</p>
                                 </div>
-                                <div className={styles.user_data}>
-                                    <div className={styles.user_name_wrapper}><input
-                                        ref={input}
-                                        placeholder={currentName}
-                                        autoComplete="off"
-                                        autoCorrect="off"
-                                        className={styles.name_input}
-                                        {...register("name", {
-                                            required: "Введите название чата",
-                                            maxLength: {
-                                                value: 30,
-                                                message: "Значение должно быть короче 30 символов"
-                                            },
-                                            pattern: {
-                                                value: /\S/,
-                                                message: "Некорректное название чата"
-                                            },
-                                        })}
-                                        disabled={!isEditing || isSubmitting}/>
-                                        <p className={styles.error_msg}>{errors.name?.message ? errors.name?.message : ""}</p>
-                                    </div>
-                                    <p className={styles.user_detail}>{chatInfo}</p>
+                                <p className={styles.user_detail}>{chatInfo}</p>
+                                { isChatOwner ? 
                                     <div className={styles.buttons}>
                                         {!isEditing && (<input type="button" onClick={() => setIsEditing(true)} value={"Изменить"} className={styles.edit_button}/>)}
                                         {isEditing && (<>
@@ -253,14 +324,20 @@ export default function ChatHeader({ id, username, name, isPrivate }){
                                             <input type="submit" value={"Сохранить"} disabled={isSubmitting} className={styles.edit_button}/>
                                             <input type="button" onClick={() => resetEditing(chatImage)} value={"Отменить"} disabled={isSubmitting} className={styles.edit_button}/>
                                         </>)}
-                                    </div>
-                                </div>
-                            </form>
-                        </div>)
-                    }
-                </div> :
-                <></>
-            }
+                                    </div> :
+                                    <></>
+                                }
+                            </div>
+                        </form>
+                        { !chat.private ? <button onClick={leaveChat} className={styles.leave_chat_btn}>Покинуть чат</button> : <></> }
+                        { isChatOwner ? <ChatUserAddInput id={chat.id}></ChatUserAddInput> : <></> }
+                        <h2>Участники</h2>
+                        <div className={styles.chat_users}>
+                            {chat.users.map((user) => (<ChatUserPanel key={user.id} chatId={chat.id} data={user} isOwner={isChatOwner}></ChatUserPanel>))}
+                        </div>
+                    </div>)
+                }
+            </div>
         </>
     );
 }

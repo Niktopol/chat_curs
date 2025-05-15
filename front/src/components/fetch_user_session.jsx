@@ -1,5 +1,6 @@
 "use client"
 
+import { setChat } from "@/store/chatSelectedSlice";
 import { fetchUserSession } from "@/store/thunks/userSessionThunk";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -10,6 +11,15 @@ export default function FetchUserSession({ mustHaveSession, redirect }) {
     const router = useRouter();
 
     useEffect(() => {
+        dispatch(setChat(
+            {
+                id: null,
+                username: "",
+                name: "",
+                private: null,
+                new: null,
+                image: "/default_user.svg"
+            }));
         if (mustHaveSession){
             dispatch(fetchUserSession())
             .unwrap()

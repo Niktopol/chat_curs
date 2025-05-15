@@ -6,6 +6,8 @@ const initialState = {
     name: "",
     private: null,
     new: null,
+    image: "/default_user.svg",
+    users: [],
     messages: []
 };
 
@@ -19,16 +21,19 @@ export const chatSelectedSlice = createSlice({
             state.name = action.payload.name;
             state.private = action.payload.private;
             state.new = action.payload.new;
-            state.messages = [];
+            state.image = action.payload.image;
         },
         addMessages: (state, action) => {
             state.messages = [...action.payload, ...state.messages];
         },
         postMessage: (state, action) => {
             state.messages = [...state.messages, action.payload];
+        },
+        setUsers: (state, action) => {
+            state.users = [...action.payload]
         }
     },
 });
 
-export const { setChat, addMessages, postMessage } = chatSelectedSlice.actions;
+export const { setChat, addMessages, postMessage, setUsers } = chatSelectedSlice.actions;
 export default chatSelectedSlice.reducer;

@@ -12,8 +12,9 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
     const websocket = useSelector((state) => state.websocketMessage);
     const [image, setImage] = useState("/default_user.svg");
     const [contextOpen, setContextOpen] = useState(false);
+    const [isOnline, setIsOnline] = useState(data.isOnline);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [currentName, setCurrentName] = useState(name);
+    const [currentName, setCurrentName] = useState(data.name);
     const router = useRouter();
 
     useEffect(() => {
@@ -56,6 +57,14 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
             fetchProfile();
             fetchImage();
         }
+
+        if (websocket.message?.title === "User went online" && websocket.message.username == data.username) {
+            setIsOnline(true);
+        }
+        if (websocket.message?.title === "User went offline" && websocket.message.username == data.username) {
+            setIsOnline(false);
+        }
+          
     },[websocket]);
 
     useEffect(() => {
@@ -129,7 +138,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
                 <div className={styles.user_info}>
                     <p className={styles.info}><span>@</span>{data.username}</p>
                     <p className={styles.name}>{currentName}{data?.isOwner ? <span className={styles.role}>Владалец</span> : <></>}</p>
-                    <p className={styles.info}>{data.isOnline ? "В сети" : "Не в сети"}</p>
+                    <p className={styles.info}>{isOnline ? "В сети" : "Не в сети"}</p>
                 </div>
                 {isOwner && !data.isOwner ?
                     <div className={styles.context_wrapper}>

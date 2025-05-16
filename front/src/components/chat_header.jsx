@@ -37,7 +37,7 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
             if (user_resp.ok) {
                 setChatInfo((await user_resp.json()).isOnline ? "В сети" : "Не в сети")
             } else {
-                throw new Error((await res.json())?.error);
+                throw new Error((await user_resp.json())?.error);
             }
         } catch (e) {
             router.push("/login");
@@ -48,16 +48,14 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
         setIsEditing(false);
         setImageErrorMsg("");
         setDoDelChatPic(false);
-        setChatImage(image);
         reset({name: chat.name});
     }
 
     useEffect(() => {
         if (!isEditing) {
-            console.log(image);
             setChatImage(image);
         }
-    }, [image]);
+    }, [image, isEditing]);
 
     useEffect(() => {
         return () => {
@@ -75,7 +73,8 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
 
     useEffect(() => {
         resetEditing();
-    }, [chat.id, chat.username]);
+
+    }, [chat.id, chat.username, chat.new]);
 
     useEffect(() => {
         if (!chat.private) {
@@ -95,7 +94,7 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
             fetchUserStatus();
         }
         
-    }, [chat.users]);
+    }, [chat.id, chat.username, chat.users, chat.new]);
     
     useEffect(() => {
         if (doDelChatPic) {
@@ -287,31 +286,8 @@ export default function ChatHeader(){
         }
     }, [chatImage]);
 
-    const fetchChatBaseInfo = async () => {
-        try {
-            const resp = await fetch(`http://localhost:8080/chats/${chat.id}`, {credentials: "include"});
-
-            if (!resp.ok) {
-                throw new Error((await resp.json())?.error);
-            } else {
-                const data = await resp.json();
-                dispatch(setChat(data));
-            }
-        } catch (e) {
-            dispatch(setChat(
-                {
-                    id: null,
-                    username: "",
-                    name: "",
-                    private: null,
-                    new: null,
-                    image: "/default_user.svg"
-                }));
-        }
-    }
-
-    const fetchChatInfo = async () => {
-        if (chat.private) {
+    const fetchChatImage = async () => {
+        if (chat.private){
             try {
                 const userpic_resp = await fetch(`http://localhost:8080/user/profilepic/${encodeURIComponent(chat.username)}`, {credentials: "include"});
 
@@ -320,14 +296,6 @@ export default function ChatHeader(){
                     setChatImage(URL.createObjectURL(blob));
                 } else {
                     setChatImage("/default_user.svg");
-                }
-
-                const user_resp = await fetch(`http://localhost:8080/user/profile/${encodeURIComponent(chat.username)}`, {credentials: "include"});
-
-                if (user_resp.ok) {
-                    setChatInfo((await user_resp.json()).isOnline ? "В сети" : "Не в сети")
-                } else {
-                    throw new Error((await res.json())?.error);
                 }
             } catch (e) {
                 dispatch(setChat(
@@ -348,6 +316,49 @@ export default function ChatHeader(){
                     setChatImage(url);
                 } else {
                     setChatImage("/default_user.svg");
+                }
+            } catch (e) {
+                dispatch(setChat(
+                {
+                    id: null,
+                    username: "",
+                    name: "",
+                    private: null,
+                    new: null
+                }));
+            }
+        }
+    }
+
+    const fetchChatInfo = async () => {
+        if (chat.private) {
+            try {
+                const user_resp = await fetch(`http://localhost:8080/user/profile/${encodeURIComponent(chat.username)}`, {credentials: "include"});
+
+                if (user_resp.ok) {
+                    setChatInfo((await user_resp.json()).isOnline ? "В сети" : "Не в сети")
+                } else {
+                    throw new Error((await user_resp.json())?.error);
+                }
+            } catch (e) {
+                dispatch(setChat(
+                {
+                    id: null,
+                    username: "",
+                    name: "",
+                    private: null,
+                    new: null
+                }));
+            }
+        } else {
+            try {
+                const resp = await fetch(`http://localhost:8080/chats/${chat.id}`, {credentials: "include"});
+
+                if (!resp.ok) {
+                    throw new Error((await resp.json())?.error);
+                } else {
+                    const data = await resp.json();
+                    dispatch(setChat(data));
                 }
 
                 const chat_users_resp = await fetch(`http://localhost:8080/chats/users/${chat.id}`, {credentials: "include"});
@@ -375,17 +386,24 @@ export default function ChatHeader(){
     useEffect(() => {
         setChatImage("/default_user.svg");
         setChatInfo(" ");
-        if (chat.id) {
-            fetchChatInfo();
-        }
+        fetchChatInfo();
+        fetchChatImage();
         setEditOpen(false);
-    }, [chat.id, chat.username])
+    }, [chat.id, chat.username, chat.new])
 
 
     useEffect(() => {
-        if (websocket.message?.title === "Chat info updated" && websocket.message.id == chat.id) {
+        if (!chat.private && websocket.message?.title === "Chat info updated" && websocket.message.id == chat.id) {
             fetchChatInfo();
-            fetchChatBaseInfo();
+        }
+        if (!chat.private && websocket.message?.title === "Chat image updated" && websocket.message.id == chat.id) {
+            fetchChatImage();
+        }
+        if (!chat.new && chat.private && websocket.message?.title === "User went online" && websocket.message.username == chat.username) {
+            setChatInfo("В сети");
+        }
+        if (!chat.new && chat.private && websocket.message?.title === "User went offline" && websocket.message.username == chat.username) {
+            setChatInfo("Не в сети");
         }
     }, [websocket])
 

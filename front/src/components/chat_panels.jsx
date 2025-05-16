@@ -108,7 +108,7 @@ export default function ChatPanels({ searchVal }){
             const el = containerRef.current;
             if (doPagesLeft && (el.scrollTop + el.clientHeight >= el.scrollHeight)) {
                 try {
-                    const res = await fetch(`http://localhost:8080/chats/${encodeURIComponent(searchVal)}?page=${page + 1}`, {credentials: "include"});
+                    const res = await fetch(`http://localhost:8080/chats?name=${encodeURIComponent(searchVal)}?page=${page + 1}`, {credentials: "include"});
                     const searchChats = await res.json();
                     setPage(page + 1);
                     setDoPagesLeft(!searchChats.last);

@@ -1,0 +1,134 @@
+.main{
+    padding: 10px;
+}
+
+.chat_create {
+    font-size: 22px;
+    padding: 10px 60px;
+    border-radius: 20px;
+    color: #fff;
+    background-color: #000;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.input_wrapper{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: flex-end;
+    width: 650px;
+}
+
+.text_wrapper{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: flex-end;
+    flex-grow: 1;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 25px;
+    box-shadow: 0 0 5px #a3a3a3;
+}
+
+.attachment{
+    position: relative;
+    height: 24px;
+    width: 24px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.attachment:hover .attachment_name{
+    opacity: 1;
+}
+
+.attachment_icon{
+    color: #000;
+    height: 100%;
+    width: 100%;
+}
+
+.attachment_cross{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 20px;
+    width: 20px;
+    padding: 2px;
+    border-radius: 50%;
+    color: #fff;
+    background-color: #f00;
+    transform: scale(0.6) translate(40%, 40%);
+}
+
+.attachment_cross_icon{
+    width: 100%;
+    height: 100%;
+}
+
+.attachment_name{
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateY(-100%);
+    background-color: #fff;
+    box-shadow: 0 0 5px #a3a3a3;
+    padding: 5px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.text{
+    display: block;
+    flex-grow: 1;
+    overflow: hidden;
+    resize: none;
+    line-height: 24px;
+    max-height: 120px;
+    font-size: 18px;
+    overflow-y: scroll;
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+
+.send_button{
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    background-color: #000;
+    box-shadow: 0 0 5px #a3a3a3;
+    padding: 15px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.send_button:hover{
+    background-color: #202020;
+}
+
+.send_button:active{
+    background-color: #363636;
+}
+
+.send_icon{
+    width: 100%;
+    height: 100%;
+    color: #fff;
+}
+
+.file_error_msg{
+    position: absolute;
+    left: 20px;
+    bottom: 0;
+    font-size: 14px;
+    color: #f00;
+}

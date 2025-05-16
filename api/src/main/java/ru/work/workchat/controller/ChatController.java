@@ -94,4 +94,9 @@ public class ChatController {
     public ResponseEntity<OperationResultDTO> createChat(@RequestBody StringDTO name){
         return ResponseEntity.status(HttpStatus.CREATED).body(new OperationResultDTO(chatService.createChat(name), null));
     }
+
+    @PostMapping("/create/{username}")
+    public ResponseEntity<ChatDTO> createChat(@PathVariable String username){
+        return ResponseEntity.status(HttpStatus.CREATED).body(chatService.createPrivateChat(username));
+    }
 }

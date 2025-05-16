@@ -29,6 +29,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ru.work.workchat.model.entity.ChatUser.Role.MEMBER;
 import static ru.work.workchat.model.entity.ChatUser.Role.OWNER;
@@ -42,7 +44,7 @@ public class ChatService {
     ChatUserRepository chatUserRepository;
     SimpMessagingTemplate messagingTemplate;
 
-    private void sendChatUpdatedMessage(Long id, String extraUsername){
+    private void sendChatUpdatedMessage(Long id, String extraUsername, String message){
         ArrayList<String> users = new ArrayList<>(chatUserRepository.findByChatIdOrderByUser_Name(id).stream().map(
                 (user) -> user.getUser().getUsername()).toList());
         if (extraUsername != null){
@@ -52,7 +54,7 @@ public class ChatService {
             messagingTemplate.convertAndSendToUser(
                 user,
                 "/queue/messages",
-                new WebSocketMessageDTO("Chat info updated", id, null)
+                new WebSocketMessageDTO(message, id, null)
             );
         }
     }
@@ -151,6 +153,44 @@ public class ChatService {
         return "Чат создан";
     }
 
+    @Transactional
+    public ChatDTO createPrivateChat(String username){
+        User user1 = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get();
+
+        User user2 = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+
+        Set<Long> idsFromList1 = chatRepository.findByIsPrivateTrueAndChatUsers_User_Username(user1.getUsername())
+                .stream().map(Chat::getId)
+                .collect(Collectors.toSet());
+
+        boolean hasCommonId = chatRepository.findByIsPrivateTrueAndChatUsers_User_Username(user2.getUsername()).stream()
+                .map(Chat::getId)
+                .anyMatch(idsFromList1::contains);
+
+        if (hasCommonId) {
+            throw new IllegalArgumentException("Чат уже сществует");
+        }
+
+        Chat chat = new Chat();
+        chat.setPrivate(true);
+        chat.setLastMessageTime(LocalDateTime.now());
+
+        ChatUser chatUser1 = new ChatUser(chat, user1, MEMBER);
+        ChatUser chatUser2 = new ChatUser(chat, user2, MEMBER);
+
+        chat.setChatUsers(new ArrayList<>(List.of(chatUser1, chatUser2)));
+
+        Chat finalChat = chatRepository.save(chat);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sendChatUpdatedMessage(finalChat.getId(), null, "Chat info updated");
+            }
+        });
+
+        return new ChatDTO(finalChat.getId(), username, user2.getName(), true, false);
+    }
+
     private boolean isJPEG(MultipartFile file) throws IOException {
         byte[] header = new byte[2];
         try (InputStream is = file.getInputStream()) {
@@ -161,7 +201,8 @@ public class ChatService {
     }
 
     private void checkChatEditAuthority(Long chatId){
-        User owner = chatUserRepository.findByChatIdAndRole(chatId, OWNER).stream().findFirst().get().getUser();
+        User owner = chatUserRepository.findByChatIdAndRole(chatId, OWNER)
+                .stream().findFirst().orElseThrow(() -> new ChatNotFoundException("Чат не найден")).getUser();
 
         if (!Objects.equals(userRepository.findByUsername(
                         SecurityContextHolder.getContext().getAuthentication().getName())
@@ -190,7 +231,7 @@ public class ChatService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                sendChatUpdatedMessage(chatId, null);
+                sendChatUpdatedMessage(chatId, null, "Chat image updated");
             }
         });
 
@@ -212,7 +253,7 @@ public class ChatService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                sendChatUpdatedMessage(chatId, null);
+                sendChatUpdatedMessage(chatId, null, "Chat info updated");
             }
         });
 
@@ -230,7 +271,7 @@ public class ChatService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                sendChatUpdatedMessage(chatId, null);
+                sendChatUpdatedMessage(chatId, null, "Chat image updated");
             }
         });
 
@@ -283,7 +324,7 @@ public class ChatService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                sendChatUpdatedMessage(chatId, username.getValue());
+                sendChatUpdatedMessage(chatId, username.getValue(), "Chat info updated");
             }
         });
 
@@ -339,7 +380,7 @@ public class ChatService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                sendChatUpdatedMessage(chatId, username.getValue());
+                sendChatUpdatedMessage(chatId, username.getValue(), "Chat info updated");
             }
         });
 
@@ -372,7 +413,7 @@ public class ChatService {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-                sendChatUpdatedMessage(chatId, username.getValue());
+                sendChatUpdatedMessage(chatId, username.getValue(), "Chat info updated");
             }
         });
 

@@ -29,7 +29,7 @@ export function ChatPanel({ data }){
     useEffect(() => {
         return () => {
             if (chatPic.startsWith('blob:')) {
-                if (chatPic) URL.revokeObjectURL(chatPic);
+                URL.revokeObjectURL(chatPic);
             }
         }
     }, [chatPic]);
@@ -62,12 +62,6 @@ export function ChatPanel({ data }){
             router.push("/login");
         }
     }, [data]);
-
-    useEffect(() => {
-        if (websocket.message?.title === "Chat info updated" && !data.isPrivate && websocket.message.id == data.id ) {
-            setChat({...data, image: chatPic});
-        }
-    }, [websocket])
 
     const selectChat = async () => {
         dispatch(setChat(data));

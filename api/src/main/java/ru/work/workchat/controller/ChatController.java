@@ -32,6 +32,11 @@ public class ChatController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ChatDTO> getChatName(@PathVariable Long id){
+        return ResponseEntity.ok(chatService.getChatName(id));
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<OperationResultDTO> editChatName(@RequestBody StringDTO name, @PathVariable Long id){
         return ResponseEntity.ok(new OperationResultDTO(chatService.editChatName(name, id), null));

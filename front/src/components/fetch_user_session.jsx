@@ -17,8 +17,7 @@ export default function FetchUserSession({ mustHaveSession, redirect }) {
                 username: "",
                 name: "",
                 private: null,
-                new: null,
-                image: "/default_user.svg"
+                new: null
             }));
         if (mustHaveSession){
             dispatch(fetchUserSession())

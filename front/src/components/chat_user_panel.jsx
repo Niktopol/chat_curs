@@ -36,6 +36,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
 
     const delUser = async () => {
         if (!isSubmitting){
+            setContextOpen(false);
             setIsSubmitting(true);
 
             try {
@@ -58,6 +59,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
 
     const promoteUser = async () => {
         if (!isSubmitting){
+            setContextOpen(false);
             setIsSubmitting(true);
             
             try {

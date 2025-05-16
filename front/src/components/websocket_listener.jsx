@@ -13,7 +13,6 @@ export default function WebSocketListener({ topic = "/user/queue/messages" }) {
     const router = useRouter()
 
     const onMessage = (msg) => {
-        console.log(msg);
         dispatch(setMessage(msg))
     };
 

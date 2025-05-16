@@ -6,7 +6,6 @@ const initialState = {
     name: "",
     private: null,
     new: null,
-    image: "/default_user.svg",
     users: [],
     messages: []
 };
@@ -21,7 +20,6 @@ export const chatSelectedSlice = createSlice({
             state.name = action.payload.name;
             state.private = action.payload.private;
             state.new = action.payload.new;
-            state.image = action.payload.image;
         },
         addMessages: (state, action) => {
             state.messages = [...action.payload, ...state.messages];

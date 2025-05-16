@@ -8,6 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 import ru.work.workchat.configuration.excepion.ChatNotFoundException;
 import ru.work.workchat.configuration.excepion.ImageNotFoundException;
@@ -62,6 +64,23 @@ public class ChatService {
                 chatRepository.findByIsPrivateFalseAndChatUsers_User_UsernameOrderByLastMessageTimeDesc(username),
                 username
         );
+    }
+
+    public ChatDTO getChatName(Long chatId){
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new ChatNotFoundException("Чат не найден"));
+
+        if(chatUserRepository.findByChatIdAndUser_Username(
+                chatId,
+                SecurityContextHolder.getContext().getAuthentication().getName()).isEmpty()){
+            throw new ChatNotFoundException("Чат не найден");
+        }
+
+        return new ChatDTO(
+                chatId,
+                null,
+                chat.getName(),
+                chat.isPrivate(),
+                false);
     }
 
     public ChatsPageDTO getChatsByName(String name, int page){
@@ -168,7 +187,12 @@ public class ChatService {
         chat.setChatPic(file.getBytes());
         chatRepository.save(chat);
 
-        sendChatUpdatedMessage(chatId, null);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sendChatUpdatedMessage(chatId, null);
+            }
+        });
 
         return "Фото чата изменено";
     }
@@ -185,7 +209,12 @@ public class ChatService {
         chat.setName(name.getValue());
         chatRepository.save(chat);
 
-        sendChatUpdatedMessage(chatId, null);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sendChatUpdatedMessage(chatId, null);
+            }
+        });
 
         return "Имя чата изменено";
     }
@@ -198,7 +227,12 @@ public class ChatService {
         chat.setChatPic(null);
         chatRepository.save(chat);
 
-        sendChatUpdatedMessage(chatId, null);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sendChatUpdatedMessage(chatId, null);
+            }
+        });
 
         return "Фото чата удалено";
     }
@@ -246,7 +280,12 @@ public class ChatService {
 
         chatUserRepository.save(user);
 
-        sendChatUpdatedMessage(chatId, username.getValue());
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sendChatUpdatedMessage(chatId, username.getValue());
+            }
+        });
 
         return "Пользователь добавлен";
     }
@@ -296,7 +335,13 @@ public class ChatService {
                 chatUserRepository.save(users.get(0));
             }
         }
-        sendChatUpdatedMessage(chatId, username.getValue());
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sendChatUpdatedMessage(chatId, username.getValue());
+            }
+        });
 
         return "Участник чата удалён";
     }
@@ -324,7 +369,12 @@ public class ChatService {
         chatUserRepository.save(admin);
         chatUserRepository.save(user);
 
-        sendChatUpdatedMessage(chatId, username.getValue());
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sendChatUpdatedMessage(chatId, username.getValue());
+            }
+        });
 
         return "Владелец чата изменён";
     }

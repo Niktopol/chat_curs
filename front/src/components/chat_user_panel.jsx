@@ -6,11 +6,14 @@ import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
 export default function ChatUserPanel({ chatId, data, isOwner }){
+    const websocket = useSelector((state) => state.websocketMessage);
     const [image, setImage] = useState("/default_user.svg");
     const [contextOpen, setContextOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [currentName, setCurrentName] = useState(name);
     const router = useRouter();
 
     useEffect(() => {
@@ -20,6 +23,40 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
             }
         }
     }, [image]);
+
+    useEffect(() => {
+        setCurrentName(data.name);
+    }, [data.name]);
+
+    useEffect(() => {
+        const fetchImage = async () => {
+            const userpic_resp = await fetch(`http://localhost:8080/user/profilepic/${encodeURIComponent(data.username)}`, {credentials: "include"});
+
+            if (userpic_resp.ok) {
+                const blob = await userpic_resp.blob();
+                setImage(URL.createObjectURL(blob));
+            }
+        }
+
+        const fetchProfile = async () => {
+            try {
+                const resp = await fetch(`http://localhost:8080/user/profile/${encodeURIComponent(data.username)}`, {credentials: "include"});
+                
+                if (!resp.ok) {
+                    throw new Error((await resp.json())?.error);
+                } else {
+                    setCurrentName((await resp.json()).name);
+                }
+            } catch (e) {
+                router.push("/login")
+            }
+        };
+
+        if (websocket.message?.title === "User info updated" && websocket.message.username == data.username) {
+            fetchProfile();
+            fetchImage();
+        }
+    },[websocket]);
 
     useEffect(() => {
         const fetchImage = async () => {
@@ -32,7 +69,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
         }
 
         fetchImage();
-    }, [data])
+    }, [data.username])
 
     const delUser = async () => {
         if (!isSubmitting){
@@ -91,7 +128,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
                 </div>
                 <div className={styles.user_info}>
                     <p className={styles.info}><span>@</span>{data.username}</p>
-                    <p className={styles.name}>{data.name}{data?.isOwner ? <span className={styles.role}>Владалец</span> : <></>}</p>
+                    <p className={styles.name}>{currentName}{data?.isOwner ? <span className={styles.role}>Владалец</span> : <></>}</p>
                     <p className={styles.info}>{data.isOnline ? "В сети" : "Не в сети"}</p>
                 </div>
                 {isOwner && !data.isOwner ?

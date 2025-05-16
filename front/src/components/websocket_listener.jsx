@@ -29,7 +29,7 @@ export default function WebSocketListener({ topic = "/user/queue/messages" }) {
                 });
             },
             onStompError: (frame) => {
-                router.push("/login");;
+                router.push("/login");
             },
             onWebSocketClose: (event) => {
                 router.push("/login");

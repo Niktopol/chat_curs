@@ -12,5 +12,8 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     List<Chat> findByIsPrivateTrueAndChatUsers_User_UsernameOrderByLastMessageTimeDesc(String username);
     @EntityGraph(attributePaths = {"chatUsers", "chatUsers.user"})
     List<Chat> findByIsPrivateTrueAndChatUsers_User_Username(String username);
+    @EntityGraph(attributePaths = {"chatUsers", "chatUsers.user"})
     List<Chat> findByIsPrivateFalseAndChatUsers_User_UsernameOrderByLastMessageTimeDesc(String username);
+    @EntityGraph(attributePaths = {"chatUsers", "chatUsers.user"})
+    List<Chat> findByChatUsers_User_Username(String username);
 }

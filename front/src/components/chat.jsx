@@ -61,7 +61,7 @@ export function ChatPanel({ data }){
         } catch (e) {
             router.push("/login");
         }
-    }, [data]);
+    }, [data.id, data.username]);
 
     const selectChat = async () => {
         dispatch(setChat(data));

@@ -54,6 +54,7 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
 
     useEffect(() => {
         if (!isEditing) {
+            console.log(image);
             setChatImage(image);
         }
     }, [image]);
@@ -97,7 +98,10 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
     }, [chat.users]);
     
     useEffect(() => {
-        if (doDelChatPic) setChatImage("/default_user.svg");
+        if (doDelChatPic) {
+            setValue("file", null);
+            setChatImage("/default_user.svg");
+        }
     }, [doDelChatPic]);
 
     const onSubmit = async (data) => {

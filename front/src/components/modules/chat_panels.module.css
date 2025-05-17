@@ -14,6 +14,8 @@
     height: 100%;
     padding: 10px 0;
     overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .filter_options{
@@ -132,6 +134,8 @@
     height: 100%;
     width: 100%;
     overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .chat_create_scroll_wrapper * {

@@ -8,6 +8,7 @@ import { setChat } from "@/store/chatSelectedSlice";
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperclip, faPaperPlane, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { API_URL } from "@/lib/config";
 
 function InputForm() {
     const {
@@ -44,7 +45,7 @@ function InputForm() {
             if (data.file && data.file.length) {
                 const formData = new FormData();
                 formData.append('file', data.file[0]);
-                const res = await fetch(`http://localhost:8080/messages/image/${chat.id}`, {
+                const res = await fetch(`${API_URL}/messages/image/${chat.id}`, {
                     method: "POST",
                     credentials: "include",
                     body: formData
@@ -60,7 +61,7 @@ function InputForm() {
             }
 
             if (data.message) {
-                await fetch(`http://localhost:8080/messages/${chat.id}`, {
+                await fetch(`${API_URL}/messages/${chat.id}`, {
                     method: "POST",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
@@ -162,7 +163,7 @@ export default function MessageInput(){
 
     const onSubmit = async () => {
         try {
-            const res = await fetch(`http://localhost:8080/chats/create/${encodeURIComponent(chat.username)}`, {
+            const res = await fetch(`${API_URL}/chats/create/${encodeURIComponent(chat.username)}`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" }

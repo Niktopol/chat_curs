@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import styles from "./modules/chat_user_add_input.module.css";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { API_URL } from "@/lib/config";
 
 export default function ChatUserAddInput({ id }){
     const router = useRouter();
@@ -22,7 +23,7 @@ export default function ChatUserAddInput({ id }){
 
     const onSubmit = async (data) => {
         try {
-            const user_add_resp = await fetch(`http://localhost:8080/chats/users/${id}/add`, {
+            const user_add_resp = await fetch(`${API_URL}/chats/users/${id}/add`, {
                 method: "PATCH",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "react-hook-form";
+import { API_URL } from "@/lib/config";
 
 export default function ChatPanels({ searchVal }){
     const session = useSelector((state) => state.userSession);
@@ -32,7 +33,7 @@ export default function ChatPanels({ searchVal }){
     const fetchChats = async () => {
         if (session.username) {
             try {
-                const res = await fetch("http://localhost:8080/chats", {credentials: "include"});
+                const res = await fetch(`${API_URL}/chats`, {credentials: "include"});
 
                 if (!res.ok) {
                     throw new Error((await res.json())?.error);
@@ -50,7 +51,7 @@ export default function ChatPanels({ searchVal }){
             if ((searchVal.length > 1 && searchVal[0] === "@") || (searchVal.length > 0 && searchVal[0] !== "@")){
                 if (userFilterOption || (!userFilterOption && !chatFilterOption)) {
                     try {
-                        const res = await fetch(`http://localhost:8080/chats?name=${encodeURIComponent(searchVal)}`, {credentials: "include"});
+                        const res = await fetch(`${API_URL}/chats?name=${encodeURIComponent(searchVal)}`, {credentials: "include"});
                         const searchChats = await res.json();
                         setPage(0);
                         setDoPagesLeft(!searchChats.last);
@@ -112,7 +113,7 @@ export default function ChatPanels({ searchVal }){
             const el = containerRef.current;
             if (doPagesLeft && (el.scrollTop + el.clientHeight >= el.scrollHeight)) {
                 try {
-                    const res = await fetch(`http://localhost:8080/chats?name=${encodeURIComponent(searchVal)}?page=${page + 1}`, {credentials: "include"});
+                    const res = await fetch(`${API_URL}/chats?name=${encodeURIComponent(searchVal)}?page=${page + 1}`, {credentials: "include"});
                     const searchChats = await res.json();
                     setPage(page + 1);
                     setDoPagesLeft(!searchChats.last);
@@ -130,7 +131,7 @@ export default function ChatPanels({ searchVal }){
 
     const onSubmit = async (data) => {
         try {
-            const res = await fetch("http://localhost:8080/chats/create", {
+            const res = await fetch(`${API_URL}/chats/create`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

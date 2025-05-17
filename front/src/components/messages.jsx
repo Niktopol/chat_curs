@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addMessages, postMessage, setMessages } from "@/store/chatSelectedSlice";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { API_URL } from "@/lib/config";
 
 function Message({ data, profiles }){
     const session = useSelector((state) => state.userSession);
@@ -23,7 +24,7 @@ function Message({ data, profiles }){
     useEffect(() => {
         const fetchMsgImage = async () => {
             try {
-                const resp = await fetch(`http://localhost:8080/messages/image/${data.id}`, {credentials: "include"});
+                const resp = await fetch(`${API_URL}/messages/image/${data.id}`, {credentials: "include"});
             
                 if (resp.ok) {
                     const blob = await resp.blob();
@@ -78,7 +79,7 @@ export default function Messages(){
 
     const fetchMessages = async (page) => {
         try {
-            const messages = await fetch(`http://localhost:8080/messages/${chat.id}?page=${page}`, {credentials: "include"});
+            const messages = await fetch(`${API_URL}/messages/${chat.id}?page=${page}`, {credentials: "include"});
 
             if (!messages.ok) {
                 throw new Error((await user_resp.json())?.error);
@@ -99,7 +100,7 @@ export default function Messages(){
 
     const fetchUserPic = async (username) => {
         try {
-            const userpic_resp = await fetch(`http://localhost:8080/user/profilepic/${encodeURIComponent(username)}`, {credentials: "include"});
+            const userpic_resp = await fetch(`${API_URL}/user/profilepic/${encodeURIComponent(username)}`, {credentials: "include"});
         
             if (userpic_resp.ok) {
                 const blob = await userpic_resp.blob();

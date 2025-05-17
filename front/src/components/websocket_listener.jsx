@@ -1,5 +1,6 @@
 "use client"
 
+import { API_URL } from "@/lib/config";
 import { setMessage } from "@/store/websocketMessageSlice";
 import { Client } from "@stomp/stompjs";
 import { useRouter } from "next/navigation";
@@ -17,7 +18,7 @@ export default function WebSocketListener({ topic = "/user/queue/messages" }) {
     };
 
     useEffect(() => {
-        const socketFactory = () => new SockJS("http://localhost:8080/webs");
+        const socketFactory = () => new SockJS(`${API_URL}/webs`);
 
         const stompClient = new Client({
             webSocketFactory: socketFactory,

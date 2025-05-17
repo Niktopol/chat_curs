@@ -32,6 +32,8 @@
     border-top: 3px solid #fff;
     border-bottom: 3px solid #fff;
     overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     left: -100%;
     top: 0;
     z-index: 2;

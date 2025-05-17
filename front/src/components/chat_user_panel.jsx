@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+import { API_URL } from "@/lib/config";
 
 export default function ChatUserPanel({ chatId, data, isOwner }){
     const websocket = useSelector((state) => state.websocketMessage);
@@ -31,7 +32,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
 
     useEffect(() => {
         const fetchImage = async () => {
-            const userpic_resp = await fetch(`http://localhost:8080/user/profilepic/${encodeURIComponent(data.username)}`, {credentials: "include"});
+            const userpic_resp = await fetch(`${API_URL}/user/profilepic/${encodeURIComponent(data.username)}`, {credentials: "include"});
 
             if (userpic_resp.ok) {
                 const blob = await userpic_resp.blob();
@@ -41,7 +42,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
 
         const fetchProfile = async () => {
             try {
-                const resp = await fetch(`http://localhost:8080/user/profile/${encodeURIComponent(data.username)}`, {credentials: "include"});
+                const resp = await fetch(`${API_URL}/user/profile/${encodeURIComponent(data.username)}`, {credentials: "include"});
                 
                 if (!resp.ok) {
                     throw new Error((await resp.json())?.error);
@@ -69,7 +70,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
 
     useEffect(() => {
         const fetchImage = async () => {
-            const userpic_resp = await fetch(`http://localhost:8080/user/profilepic/${encodeURIComponent(data.username)}`, {credentials: "include"});
+            const userpic_resp = await fetch(`${API_URL}/user/profilepic/${encodeURIComponent(data.username)}`, {credentials: "include"});
 
             if (userpic_resp.ok) {
                 const blob = await userpic_resp.blob();
@@ -86,7 +87,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
             setIsSubmitting(true);
 
             try {
-                const del_user_resp = await fetch(`http://localhost:8080/chats/users/${chatId}/delete`, {
+                const del_user_resp = await fetch(`${API_URL}/chats/users/${chatId}/delete`, {
                     method: "PATCH",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
@@ -109,7 +110,7 @@ export default function ChatUserPanel({ chatId, data, isOwner }){
             setIsSubmitting(true);
             
             try {
-                const promote_user_resp = await fetch(`http://localhost:8080/chats/users/${chatId}/owner`, {
+                const promote_user_resp = await fetch(`${API_URL}/chats/users/${chatId}/owner`, {
                     method: "PATCH",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },

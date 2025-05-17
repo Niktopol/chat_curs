@@ -93,6 +93,8 @@
     max-height: 120px;
     font-size: 18px;
     overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     border: none;
     outline: none;
     background-color: transparent;

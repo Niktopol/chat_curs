@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import styles from "./modules/auth_forms.module.css";
 import { useRouter } from "next/navigation";
+import { API_URL } from "@/lib/config";
 
 export function RegForm() {
     const {
@@ -17,7 +18,7 @@ export function RegForm() {
     const onSubmit = async (data) => {
         if (data.password1 === data.password2){
             try {
-                const res = await fetch("http://localhost:8080/register", {
+                const res = await fetch(`${API_URL}/register`, {
                     method: "POST",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
@@ -156,7 +157,7 @@ export function LoginForm() {
 
     const onSubmit = async (data) => {
         try {
-            const res = await fetch("http://localhost:8080/login", {
+            const res = await fetch(`${API_URL}/login`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

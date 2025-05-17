@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setChat, setUsers } from "@/store/chatSelectedSlice";
 import ChatUserPanel from "./chat_user_panel";
 import ChatUserAddInput from "./chat_user_add_input";
+import { API_URL } from "@/lib/config";
 
 function ChatDataOverlay({ image, editOpen, setEditOpen }) {
     const session = useSelector((state) => state.userSession);
@@ -32,7 +33,7 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
 
     const fetchUserStatus = async () => {
         try {
-            const user_resp = await fetch(`http://localhost:8080/user/profile/${encodeURIComponent(chat.username)}`, {credentials: "include"});
+            const user_resp = await fetch(`${API_URL}/user/profile/${encodeURIComponent(chat.username)}`, {credentials: "include"});
 
             if (user_resp.ok) {
                 setChatInfo((await user_resp.json()).isOnline ? "В сети" : "Не в сети")
@@ -108,7 +109,7 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
             if (data.file && data.file.length) {
                 const formData = new FormData();
                 formData.append('file', data.file[0]);
-                const res = await fetch(`http://localhost:8080/chats/image/${chat.id}`, {
+                const res = await fetch(`${API_URL}/chats/image/${chat.id}`, {
                     method: "PATCH",
                     credentials: "include",
                     body: formData
@@ -122,7 +123,7 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
                 }
 
             } else if (doDelChatPic) {
-                const res = await fetch(`http://localhost:8080/chats/image/${chat.id}`, {
+                const res = await fetch(`${API_URL}/chats/image/${chat.id}`, {
                     method: "DELETE",
                     credentials: "include"
                 });
@@ -132,7 +133,7 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
                 }
             }
 
-            const res = await fetch(`http://localhost:8080/chats/${chat.id}`, {
+            const res = await fetch(`${API_URL}/chats/${chat.id}`, {
                 method: "PATCH",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -150,7 +151,7 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
 
     const leaveChat = async () => {
         try {
-            const leave_chat_resp = await fetch(`http://localhost:8080/chats/users/${chat.id}/delete`, {
+            const leave_chat_resp = await fetch(`${API_URL}/chats/users/${chat.id}/delete`, {
                 method: "PATCH",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -289,7 +290,7 @@ export default function ChatHeader(){
     const fetchChatImage = async () => {
         if (chat.private){
             try {
-                const userpic_resp = await fetch(`http://localhost:8080/user/profilepic/${encodeURIComponent(chat.username)}`, {credentials: "include"});
+                const userpic_resp = await fetch(`${API_URL}/user/profilepic/${encodeURIComponent(chat.username)}`, {credentials: "include"});
 
                 if (userpic_resp.ok) {
                     const blob = await userpic_resp.blob();
@@ -309,7 +310,7 @@ export default function ChatHeader(){
             }
         } else {
             try {
-                const chatpic_resp = await fetch(`http://localhost:8080/chats/image/${chat.id}`, {credentials: "include"})
+                const chatpic_resp = await fetch(`${API_URL}/chats/image/${chat.id}`, {credentials: "include"})
                 if (chatpic_resp.ok) {
                     const blob = await chatpic_resp.blob();
                     const url = URL.createObjectURL(blob)
@@ -333,7 +334,7 @@ export default function ChatHeader(){
     const fetchChatInfo = async () => {
         if (chat.private) {
             try {
-                const user_resp = await fetch(`http://localhost:8080/user/profile/${encodeURIComponent(chat.username)}`, {credentials: "include"});
+                const user_resp = await fetch(`${API_URL}/user/profile/${encodeURIComponent(chat.username)}`, {credentials: "include"});
 
                 if (user_resp.ok) {
                     setChatInfo((await user_resp.json()).isOnline ? "В сети" : "Не в сети")
@@ -342,7 +343,7 @@ export default function ChatHeader(){
                 }
 
                 if (!chat.new) {
-                    const chat_users_resp = await fetch(`http://localhost:8080/chats/users/${chat.id}`, {credentials: "include"});
+                    const chat_users_resp = await fetch(`${API_URL}/chats/users/${chat.id}`, {credentials: "include"});
       
                     if (chat_users_resp.ok) {
                         const users = await chat_users_resp.json();
@@ -364,7 +365,7 @@ export default function ChatHeader(){
             }
         } else {
             try {
-                const resp = await fetch(`http://localhost:8080/chats/${chat.id}`, {credentials: "include"});
+                const resp = await fetch(`${API_URL}/chats/${chat.id}`, {credentials: "include"});
 
                 if (!resp.ok) {
                     throw new Error((await resp.json())?.error);
@@ -373,7 +374,7 @@ export default function ChatHeader(){
                     dispatch(setChat(data));
                 }
 
-                const chat_users_resp = await fetch(`http://localhost:8080/chats/users/${chat.id}`, {credentials: "include"});
+                const chat_users_resp = await fetch(`${API_URL}/chats/users/${chat.id}`, {credentials: "include"});
       
                 if (chat_users_resp.ok) {
                     const users = await chat_users_resp.json();

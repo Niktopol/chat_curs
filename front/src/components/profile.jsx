@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { setData } from "@/store/userSessionSlice";
+import { API_URL } from "@/lib/config";
 
 export default function Profile({ hidden }){
     const session = useSelector((state) => state.userSession);
@@ -53,7 +54,7 @@ export default function Profile({ hidden }){
 
     const logout = async () => {
         try {
-            await fetch("http://localhost:8080/logout", {
+            await fetch(`${API_URL}/logout`, {
                 method: "POST",
                 credentials: "include"
             });
@@ -68,7 +69,7 @@ export default function Profile({ hidden }){
             if (data.file) {
                 const formData = new FormData();
                 formData.append('file', data.file[0]);
-                const res = await fetch("http://localhost:8080/user/profilepic", {
+                const res = await fetch(`${API_URL}/user/profilepic`, {
                     method: "PATCH",
                     credentials: "include",
                     body: formData
@@ -82,7 +83,7 @@ export default function Profile({ hidden }){
                 }
 
             } else if (doDelProfilePic) {
-                const res = await fetch("http://localhost:8080/user/profilepic", {
+                const res = await fetch(`${API_URL}"/user/profilepic`, {
                     method: "DELETE",
                     credentials: "include"
                 });
@@ -92,7 +93,7 @@ export default function Profile({ hidden }){
                 }
             }
 
-            const res = await fetch("http://localhost:8080/user/profile", {
+            const res = await fetch(`${API_URL}/user/profile`, {
                 method: "PATCH",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

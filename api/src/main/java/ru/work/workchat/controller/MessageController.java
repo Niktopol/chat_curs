@@ -2,20 +2,17 @@ package ru.work.workchat.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.work.workchat.model.dto.ImageFileDTO;
-import ru.work.workchat.model.dto.MessageDTO;
-import ru.work.workchat.model.dto.OperationResultDTO;
-import ru.work.workchat.model.dto.StringDTO;
+import ru.work.workchat.model.dto.*;
 import ru.work.workchat.service.MessageService;
 
 import java.io.IOException;
-import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -24,8 +21,8 @@ public class MessageController {
     private final MessageService messageService;
 
     @GetMapping("/{chatId}")
-    public ResponseEntity<List<MessageDTO>> getMessages(@PathVariable Long chatId,
-                                                        @RequestParam(defaultValue = "0") int page){
+    public ResponseEntity<MessagesPageDTO> getMessages(@PathVariable Long chatId,
+                                                       @RequestParam(defaultValue = "0") int page){
         return ResponseEntity.ok(messageService.getMessages(chatId, page));
     }
 

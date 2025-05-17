@@ -54,7 +54,7 @@ public class ChatService {
             messagingTemplate.convertAndSendToUser(
                 user,
                 "/queue/messages",
-                new WebSocketMessageDTO(message, id, null)
+                new WebSocketMessageDTO(message, id, null, null)
             );
         }
     }

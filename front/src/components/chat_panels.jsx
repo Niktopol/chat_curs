@@ -93,6 +93,10 @@ export default function ChatPanels({ searchVal }){
         if (websocket.message?.title === "Chat info updated"){
             fetchChats();
         }
+
+        if (websocket.message?.title === "Message received"){
+            fetchChats();
+        }
     }, [websocket])
 
     useEffect(() => {

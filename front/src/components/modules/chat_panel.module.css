@@ -67,4 +67,8 @@
 
 .last_msg{
     bottom: 0;
+    text-wrap: nowrap;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

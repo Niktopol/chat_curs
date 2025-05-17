@@ -21,11 +21,14 @@ export const chatSelectedSlice = createSlice({
             state.private = action.payload.private;
             state.new = action.payload.new;
         },
+        setMessages: (state, action) => {
+            state.messages = [...action.payload]
+        },
         addMessages: (state, action) => {
-            state.messages = [...action.payload, ...state.messages];
+            state.messages = [...state.messages, ...action.payload];
         },
         postMessage: (state, action) => {
-            state.messages = [...state.messages, action.payload];
+            state.messages = [action.payload, ...state.messages];
         },
         setUsers: (state, action) => {
             state.users = [...action.payload]
@@ -33,5 +36,5 @@ export const chatSelectedSlice = createSlice({
     },
 });
 
-export const { setChat, addMessages, postMessage, setUsers } = chatSelectedSlice.actions;
+export const { setChat, setMessages, addMessages, postMessage, setUsers } = chatSelectedSlice.actions;
 export default chatSelectedSlice.reducer;

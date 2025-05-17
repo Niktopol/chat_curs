@@ -15,12 +15,20 @@ function InputForm() {
         watch,
         handleSubmit,
         setValue,
+        reset,
         formState: { isSubmitting },
     } = useForm();
+    const chat = useSelector((state) => state.chatSelected);
     const [attachment, setAttachment] = useState(null);
     const [imageErrorMsg, setImageErrorMsg] = useState("");
     const message = watch("message");
     const textareaRef = useRef(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        reset();
+        setAttachment(null);
+    }, [chat.id])
 
     useEffect(() => {
         const textarea = textareaRef.current;
@@ -30,9 +38,41 @@ function InputForm() {
         }
     }, [message]);
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
         setImageErrorMsg("");
-        console.log("Submitted:", data);
+        try {
+            if (data.file && data.file.length) {
+                const formData = new FormData();
+                formData.append('file', data.file[0]);
+                const res = await fetch(`http://localhost:8080/messages/image/${chat.id}`, {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    setAttachment(null);
+                    setValue("file", null);
+                    setImageErrorMsg((await res.json())?.error);
+                    return;
+                }
+
+            }
+
+            if (data.message) {
+                await fetch(`http://localhost:8080/messages/${chat.id}`, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ value: data.message }),
+                });
+            }
+
+            reset();
+            setAttachment(null);
+        } catch (e) {
+            router.push("/login");
+        }
     };
 
     return (
@@ -97,6 +137,7 @@ function InputForm() {
                 placeholder="Введите сообщение..."
                 autoComplete="off"
                 autoCorrect="off"
+                maxLength={2000}
                 rows={1}
                 disabled={isSubmitting}
                 className={styles.text}/>

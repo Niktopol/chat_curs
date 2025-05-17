@@ -340,6 +340,18 @@ export default function ChatHeader(){
                 } else {
                     throw new Error((await user_resp.json())?.error);
                 }
+
+                if (!chat.new) {
+                    const chat_users_resp = await fetch(`http://localhost:8080/chats/users/${chat.id}`, {credentials: "include"});
+      
+                    if (chat_users_resp.ok) {
+                        const users = await chat_users_resp.json();
+                        dispatch(setUsers(users));
+                    } else {
+                        throw new Error((await chat_users_resp.json())?.error);
+                    }
+                }
+                
             } catch (e) {
                 dispatch(setChat(
                 {

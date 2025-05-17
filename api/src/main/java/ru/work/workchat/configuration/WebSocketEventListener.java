@@ -44,7 +44,7 @@ public class WebSocketEventListener {
             messagingTemplate.convertAndSendToUser(
                     user,
                     "/queue/messages",
-                    new WebSocketMessageDTO(message, null, username)
+                    new WebSocketMessageDTO(message, null, username, null)
             );
         }
     }

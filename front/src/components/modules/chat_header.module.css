@@ -5,6 +5,7 @@
     height: 60px;
     cursor: pointer;
     user-select: none;
+    z-index: 1;
 }
 
 .content{

@@ -87,11 +87,33 @@ export function ChatPanel({ data }){
         }
     }
 
+    const fetchLastMsg = async () => {
+        try {
+            const msg_resp = await fetch(`http://localhost:8080/messages/last/${data.id}`, {credentials: "include"});
+
+            if (msg_resp.ok) {
+                const msg = await msg_resp.json();
+                if (msg.attachment) {
+                    setLastMsg("Изображение");
+                } else {
+                    setLastMsg(msg.text);
+                }
+            } else {
+                setLastMsg("");
+            }
+        } catch (e) {
+            router.push("/login");
+        }
+    }
+
     useEffect(() => {
         if (data.private) {
             userPicFetch();
         } else {
             chatPicFetch();
+        }
+        if (!data.new) {
+            fetchLastMsg();
         }
     }, [data.id, data.username]);
 
@@ -102,6 +124,10 @@ export function ChatPanel({ data }){
         if (!data.new && data.private && websocket.message?.title === "User info updated" && websocket.message.username == data.username) {
             userPicFetch();
             userInfoFetch();
+        }
+
+        if (websocket.message?.title === "Message received" && websocket.message.id == data.id){
+            fetchLastMsg();
         }
     }, [websocket])
 

@@ -41,7 +41,7 @@ public class UserService {
             messagingTemplate.convertAndSendToUser(
                     user,
                     "/queue/messages",
-                    new WebSocketMessageDTO("User info updated", null, username)
+                    new WebSocketMessageDTO("User info updated", null, username, null)
             );
         }
     }

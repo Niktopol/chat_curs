@@ -1,6 +1,8 @@
 package ru.work.workchat.service;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -12,12 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.work.workchat.configuration.excepion.ChatNotFoundException;
 import ru.work.workchat.configuration.excepion.ImageNotFoundException;
 import ru.work.workchat.configuration.excepion.MessageNotFoundException;
-import ru.work.workchat.model.dto.ImageFileDTO;
-import ru.work.workchat.model.dto.MessageDTO;
-import ru.work.workchat.model.dto.StringDTO;
-import ru.work.workchat.model.dto.WebSocketMessageDTO;
+import ru.work.workchat.model.dto.*;
 import ru.work.workchat.model.entity.Chat;
 import ru.work.workchat.model.entity.Message;
+import ru.work.workchat.repository.ChatRepository;
 import ru.work.workchat.repository.ChatUserRepository;
 import ru.work.workchat.repository.MessageRepository;
 import ru.work.workchat.repository.UserRepository;
@@ -32,6 +32,7 @@ public class MessageService {
 
     UserRepository userRepository;
     MessageRepository messageRepository;
+    ChatRepository chatRepository;
     ChatUserRepository chatUserRepository;
     SimpMessagingTemplate messagingTemplate;
 
@@ -48,7 +49,7 @@ public class MessageService {
         }
     }
 
-    public List<MessageDTO> getMessages(Long chatId, int page) {
+    public MessagesPageDTO getMessages(Long chatId, int page) {
         chatUserRepository.findByChatIdAndUser_Username(chatId,
                 SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(() -> new ChatNotFoundException("Чат не найден"));
@@ -57,12 +58,12 @@ public class MessageService {
             throw new IllegalArgumentException("Неверный номер страницы");
         }
 
-        return messageRepository.findByChat_id(
+        return new MessagesPageDTO(messageRepository.findByChat_id(
                 chatId,
                 PageRequest.of(
                         page,
-                        100,
-                        Sort.by("createdAt").descending())).stream().map(MessageDTO::new).toList();
+                        50,
+                        Sort.by("createdAt").descending())));
     }
 
     public MessageDTO getLastMessage(Long chatId){
@@ -71,7 +72,7 @@ public class MessageService {
                 .orElseThrow(() -> new ChatNotFoundException("Чат не найден"));
 
         Message message = messageRepository.findByChat_id(chatId,
-                PageRequest.of(0, 1, Sort.by("createdAt").descending()))
+                PageRequest.of(0, 1, Sort.by("createdAt").descending())).getContent()
                 .stream().findFirst().orElseThrow(() -> new MessageNotFoundException("Сообщение не найдено"));
 
         return new MessageDTO(message);
@@ -96,12 +97,13 @@ public class MessageService {
                 "image/jpeg");
     }
 
+    @Transactional
     public String sendMessage(Long chatId, StringDTO message) {
         Chat chat = chatUserRepository.findByChatIdAndUser_Username(chatId,
                         SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(() -> new ChatNotFoundException("Чат не найден")).getChat();
 
-        if (!message.doMatch("^.*\\S.*$", 1, 2000)) {
+        if (message.getValue() == null || !message.doMatch("^.*\\S.*$", 1, 2000)) {
             throw new IllegalArgumentException("Неверный формат сообщения");
         }
 
@@ -112,6 +114,9 @@ public class MessageService {
         msg.setSender(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get());
 
         msg = messageRepository.save(msg);
+
+        chat.setLastMessageTime(msg.getCreatedAt());
+        chatRepository.save(chat);
 
         Message finalMsg = msg;
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -133,6 +138,7 @@ public class MessageService {
         return (header[0] & 0xFF) == 0xFF && (header[1] & 0xFF) == 0xD8;
     }
 
+    @Transactional
     public String sendImage(Long chatId, MultipartFile file) throws IOException {
         Chat chat = chatUserRepository.findByChatIdAndUser_Username(chatId,
                         SecurityContextHolder.getContext().getAuthentication().getName())
@@ -154,6 +160,9 @@ public class MessageService {
         msg.setSender(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get());
 
         msg = messageRepository.save(msg);
+
+        chat.setLastMessageTime(msg.getCreatedAt());
+        chatRepository.save(chat);
 
         Message finalMsg = msg;
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {

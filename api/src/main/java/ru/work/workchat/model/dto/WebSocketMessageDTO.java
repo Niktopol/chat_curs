@@ -13,4 +13,5 @@ public class WebSocketMessageDTO {
     String title;
     Long id;
     String username;
+    MessageDTO message;
 }

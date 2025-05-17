@@ -29,6 +29,11 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getMessages(chatId, page));
     }
 
+    @GetMapping("/last/{chatId}")
+    public ResponseEntity<MessageDTO> getLastMessage(@PathVariable Long chatId){
+        return ResponseEntity.ok(messageService.getLastMessage(chatId));
+    }
+
     @GetMapping("/image/{msgId}")
     public ResponseEntity<ByteArrayResource> getImage(@PathVariable Long msgId){
         ImageFileDTO image = messageService.getMsgImage(msgId);

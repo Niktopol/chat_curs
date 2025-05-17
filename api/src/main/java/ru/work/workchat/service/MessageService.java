@@ -3,8 +3,11 @@ package ru.work.workchat.service;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 import ru.work.workchat.configuration.excepion.ChatNotFoundException;
 import ru.work.workchat.configuration.excepion.ImageNotFoundException;
@@ -12,6 +15,7 @@ import ru.work.workchat.configuration.excepion.MessageNotFoundException;
 import ru.work.workchat.model.dto.ImageFileDTO;
 import ru.work.workchat.model.dto.MessageDTO;
 import ru.work.workchat.model.dto.StringDTO;
+import ru.work.workchat.model.dto.WebSocketMessageDTO;
 import ru.work.workchat.model.entity.Chat;
 import ru.work.workchat.model.entity.Message;
 import ru.work.workchat.repository.ChatUserRepository;
@@ -29,6 +33,20 @@ public class MessageService {
     UserRepository userRepository;
     MessageRepository messageRepository;
     ChatUserRepository chatUserRepository;
+    SimpMessagingTemplate messagingTemplate;
+
+    private void sendMessageSentMessage(Long chatId, Message message){
+        List<String> users = chatUserRepository.findByChatIdOrderByUser_Name(chatId).stream().map(
+                (user) -> user.getUser().getUsername()).toList();
+
+        for (String user : users){
+            messagingTemplate.convertAndSendToUser(
+                    user,
+                    "/queue/messages",
+                    new WebSocketMessageDTO("Message received", chatId, null, new MessageDTO(message))
+            );
+        }
+    }
 
     public List<MessageDTO> getMessages(Long chatId, int page) {
         chatUserRepository.findByChatIdAndUser_Username(chatId,
@@ -45,6 +63,18 @@ public class MessageService {
                         page,
                         100,
                         Sort.by("createdAt").descending())).stream().map(MessageDTO::new).toList();
+    }
+
+    public MessageDTO getLastMessage(Long chatId){
+        chatUserRepository.findByChatIdAndUser_Username(chatId,
+                        SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new ChatNotFoundException("Чат не найден"));
+
+        Message message = messageRepository.findByChat_id(chatId,
+                PageRequest.of(0, 1, Sort.by("createdAt").descending()))
+                .stream().findFirst().orElseThrow(() -> new MessageNotFoundException("Сообщение не найдено"));
+
+        return new MessageDTO(message);
     }
 
     public ImageFileDTO getMsgImage(Long msgId) {
@@ -81,7 +111,15 @@ public class MessageService {
         msg.setChat(chat);
         msg.setSender(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get());
 
-        messageRepository.save(msg);
+        msg = messageRepository.save(msg);
+
+        Message finalMsg = msg;
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sendMessageSentMessage(chatId, finalMsg);
+            }
+        });
 
         return "Сообщение отправлено";
     }
@@ -115,7 +153,15 @@ public class MessageService {
         msg.setChat(chat);
         msg.setSender(userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).get());
 
-        messageRepository.save(msg);
+        msg = messageRepository.save(msg);
+
+        Message finalMsg = msg;
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                sendMessageSentMessage(chatId, finalMsg);
+            }
+        });
 
         return "Сообщение отправлено";
     }

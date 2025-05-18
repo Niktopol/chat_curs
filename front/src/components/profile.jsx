@@ -29,7 +29,7 @@ export default function Profile({ hidden }){
     }
 
     useEffect(() => {
-        if (doDelProfilePic) setUserImage("/default_user.svg");
+        if (doDelProfilePic) setUserImage("/chat_curs/default_user.svg");
     }, [doDelProfilePic]);
 
     useEffect(() => {

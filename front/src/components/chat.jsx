@@ -30,7 +30,7 @@ export function Chat(){
 
 export function ChatPanel({ data }){
     const [lastMsg, setLastMsg] = useState("");
-    const [chatPic, setChatPic] = useState("/default_user.svg");
+    const [chatPic, setChatPic] = useState("/chat_curs/default_user.svg");
     const [currentName, setCurrentName] = useState(data.name);
     const websocket = useSelector((state) => state.websocketMessage);
     const dispatch = useDispatch();

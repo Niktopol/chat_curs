@@ -11,7 +11,7 @@ import { API_URL } from "@/lib/config";
 
 export default function ChatUserPanel({ chatId, data, isOwner }){
     const websocket = useSelector((state) => state.websocketMessage);
-    const [image, setImage] = useState("/default_user.svg");
+    const [image, setImage] = useState("/chat_curs/default_user.svg");
     const [contextOpen, setContextOpen] = useState(false);
     const [isOnline, setIsOnline] = useState(data.isOnline);
     const [isSubmitting, setIsSubmitting] = useState(false);

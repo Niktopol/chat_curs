@@ -6,7 +6,7 @@ const initialState = {
   username: "",
   loading: true,
   error: null,
-  image: "/default_user.svg"
+  image: "/chat_curs/default_user.svg"
 };
 
 export const userSessionSlice = createSlice({
@@ -36,7 +36,7 @@ export const userSessionSlice = createSlice({
         if (action.payload?.image) {
           state.image = action.payload.image;
         } else {
-          state.image = "/default_user.svg";
+          state.image = "/chat_curs/default_user.svg";
         }
         
       })
@@ -45,7 +45,7 @@ export const userSessionSlice = createSlice({
         state.username = "";
         state.loading = false;
         state.error = action.payload;
-        state.image = "/default_user.svg";
+        state.image = "/chat_curs/default_user.svg";
       });
   }
 });

@@ -100,7 +100,7 @@ function ChatDataOverlay({ image, editOpen, setEditOpen }) {
     useEffect(() => {
         if (doDelChatPic) {
             setValue("file", null);
-            setChatImage("/default_user.svg");
+            setChatImage("/chat_curs/default_user.svg");
         }
     }, [doDelChatPic]);
 
@@ -275,7 +275,7 @@ export default function ChatHeader(){
     const chat = useSelector((state) => state.chatSelected);
     const websocket = useSelector((state) => state.websocketMessage);
     const [editOpen, setEditOpen] = useState(false);
-    const [chatImage, setChatImage] = useState("/default_user.svg");
+    const [chatImage, setChatImage] = useState("/chat_curs/default_user.svg");
     const [chatInfo, setChatInfo] = useState(" ");
     const dispatch = useDispatch();
 
@@ -296,7 +296,7 @@ export default function ChatHeader(){
                     const blob = await userpic_resp.blob();
                     setChatImage(URL.createObjectURL(blob));
                 } else {
-                    setChatImage("/default_user.svg");
+                    setChatImage("/chat_curs/default_user.svg");
                 }
             } catch (e) {
                 dispatch(setChat(
@@ -316,7 +316,7 @@ export default function ChatHeader(){
                     const url = URL.createObjectURL(blob)
                     setChatImage(url);
                 } else {
-                    setChatImage("/default_user.svg");
+                    setChatImage("/chat_curs/default_user.svg");
                 }
             } catch (e) {
                 dispatch(setChat(
@@ -397,7 +397,7 @@ export default function ChatHeader(){
     }
 
     useEffect(() => {
-        setChatImage("/default_user.svg");
+        setChatImage("/chat_curs/default_user.svg");
         setChatInfo(" ");
         fetchChatInfo();
         fetchChatImage();

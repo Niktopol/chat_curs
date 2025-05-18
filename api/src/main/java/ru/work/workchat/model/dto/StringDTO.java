@@ -13,6 +13,6 @@ public class StringDTO {
     String value;
 
     public boolean doMatch(String regex, int minlength, int maxLength){
-        return Pattern.matches(regex, value) && value.length() >= minlength && value.length() <= maxLength;
+        return value != null && Pattern.matches(regex, value) && value.length() >= minlength && value.length() <= maxLength;
     }
 }

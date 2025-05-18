@@ -15,15 +15,15 @@ public class UserDTO {
     private String password;
 
     public boolean isNameValid(){
-        return Pattern.matches("^\\S+$", name) && !name.isEmpty() && name.length() <= 20;
+        return name != null && Pattern.matches("^\\S+$", name) && !name.isEmpty() && name.length() <= 20;
     }
 
     public boolean isUsernameValid(){
-        return Pattern.matches("^[A-Za-z0-9\\-_]+$", username) && !username.isEmpty() && username.length() <= 20;
+        return username != null && Pattern.matches("^[A-Za-z0-9\\-_]+$", username) && !username.isEmpty() && username.length() <= 20;
     }
 
     public boolean isPasswordValid(){
-        return Pattern.matches("^[A-Za-z0-9\\-=_#+&$]+$", password) && password.length() >= 8 && password.length() <= 25;
+        return password != null && Pattern.matches("^[A-Za-z0-9\\-=_#+&$]+$", password) && password.length() >= 8 && password.length() <= 25;
     }
 
     public UserDTO(){

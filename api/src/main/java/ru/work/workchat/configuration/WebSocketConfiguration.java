@@ -20,7 +20,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/webs")
-                .setAllowedOrigins("http://localhost:3000")
+                .setAllowedOrigins("https://niktopol.github.io")
                 .withSockJS();
     }
 }

@@ -73,9 +73,6 @@ export default function Messages(){
     const [profiles, setProfiles] = useState(null);
     const dispatch = useDispatch();
     const router = useRouter();
-    const messagesRef = useRef(chat.messages);
-    const pageRef = useRef(msgPage);
-    const pageFinalRef = useRef(isPageFinal);
 
     const fetchMessages = async (page) => {
         try {
@@ -126,24 +123,12 @@ export default function Messages(){
     };
 
     useEffect(() => {
-        messagesRef.current = chat.messages;
-    }, [chat.messages]);
-
-    useEffect(() => {
-        pageRef.current = msgPage;
-    }, [msgPage]);
-
-    useEffect(() => {
-        pageFinalRef.current = isPageFinal;
-    }, [isPageFinal]);
-
-    useEffect(() => {
         if (!containerRef.current || !topRef.current) return;
-
+        
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry.isIntersecting && messagesRef.current.length > 0 && !pageFinalRef.current){
-                    fetchMessages(pageRef.current + 1);
+                if (entry.isIntersecting && chat.messages.length > 0 && !isPageFinal){
+                    fetchMessages(msgPage + 1);
                 }
             },
             {
@@ -157,7 +142,7 @@ export default function Messages(){
         return () => {
             observer.disconnect();
         };
-    }, []);
+    }, [chat, msgPage, isPageFinal]);
 
     useEffect(() => {
         return () => {

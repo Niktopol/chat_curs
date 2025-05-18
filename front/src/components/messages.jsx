@@ -48,7 +48,7 @@ function Message({ data, profiles }){
                 <div className={styles.sender_profile}>
                     <p className={styles.sender_username}><span>@</span>{data.sender}</p>
                     <div className={styles.sender_pic}>
-                        <Image src={profiles?.[data.sender] ? profiles[data.sender] : "/default_user.svg"} alt="" fill draggable={false} style={{objectFit: "cover"}}></Image>
+                        <Image src={profiles?.[data.sender] ? profiles[data.sender] : "/chat_curs/default_user.svg"} alt="" fill draggable={false} style={{objectFit: "cover"}}></Image>
                     </div>
                 </div>
                 <div className={styles.cloud}>
@@ -103,7 +103,7 @@ export default function Messages(){
                 const blob = await userpic_resp.blob();
                 return URL.createObjectURL(blob);
             } else {
-                return "/default_user.svg";
+                return "/chat_curs/default_user.svg";
             }
         } catch (e) {
             router.push("/login");

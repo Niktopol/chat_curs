@@ -48,7 +48,7 @@ function Message({ data, profiles }){
                 <div className={styles.sender_profile}>
                     <p className={styles.sender_username}><span>@</span>{data.sender}</p>
                     <div className={styles.sender_pic}>
-                        <Image src={profiles?.[data.sender] ? profiles[data.sender] : "/chat_curs/default_user.svg"} alt="" fill draggable={false} style={{objectFit: "cover"}}></Image>
+                        <Image src={profiles?.[data.sender] ? profiles[data.sender] : "/default_user.svg"} alt="" fill draggable={false} style={{objectFit: "cover"}}></Image>
                     </div>
                 </div>
                 <div className={styles.cloud}>
@@ -73,9 +73,6 @@ export default function Messages(){
     const [profiles, setProfiles] = useState(null);
     const dispatch = useDispatch();
     const router = useRouter();
-    const messagesRef = useRef(chat.messages);
-    const pageRef = useRef(msgPage);
-    const pageFinalRef = useRef(isPageFinal);
 
     const fetchMessages = async (page) => {
         try {
@@ -106,7 +103,7 @@ export default function Messages(){
                 const blob = await userpic_resp.blob();
                 return URL.createObjectURL(blob);
             } else {
-                return "/chat_curs/default_user.svg";
+                return "/default_user.svg";
             }
         } catch (e) {
             router.push("/login");
@@ -126,24 +123,12 @@ export default function Messages(){
     };
 
     useEffect(() => {
-        messagesRef.current = chat.messages;
-    }, [chat.messages]);
-
-    useEffect(() => {
-        pageRef.current = msgPage;
-    }, [msgPage]);
-
-    useEffect(() => {
-        pageFinalRef.current = isPageFinal;
-    }, [isPageFinal]);
-
-    useEffect(() => {
         if (!containerRef.current || !topRef.current) return;
-
+        
         const observer = new IntersectionObserver(
             ([entry]) => {
-                if (entry.isIntersecting && messagesRef.current.length > 0 && !pageFinalRef.current){
-                    fetchMessages(pageRef.current + 1);
+                if (entry.isIntersecting && chat.messages.length > 0 && !isPageFinal){
+                    fetchMessages(msgPage + 1);
                 }
             },
             {
@@ -157,7 +142,7 @@ export default function Messages(){
         return () => {
             observer.disconnect();
         };
-    }, []);
+    }, [chat, msgPage, isPageFinal]);
 
     useEffect(() => {
         return () => {
